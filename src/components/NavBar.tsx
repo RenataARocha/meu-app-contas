@@ -1,3 +1,7 @@
+// src/components/NavBar.tsx
+// Barra de navegação inferior fixa — estilo app mobile
+// "use client" para acessar usePathname (rota atual)
+
 "use client";
 
 import Link from "next/link";
@@ -26,10 +30,17 @@ export function NavBar() {
                             href={href}
                             className={cn(
                                 "flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl transition-all",
-                                ativo ? "text-brand-400" : "text-muted-foreground hover:text-foreground"
+                                ativo
+                                    ? "text-brand-400"
+                                    : "text-muted-foreground hover:text-foreground"
                             )}
                         >
-                            <div className={cn("p-1.5 rounded-lg transition-all", ativo && "bg-brand-500/10")}>
+                            <div
+                                className={cn(
+                                    "p-1.5 rounded-lg transition-all",
+                                    ativo && "bg-brand-500/10 glow-green"
+                                )}
+                            >
                                 <Icon size={20} strokeWidth={ativo ? 2.5 : 1.5} />
                             </div>
                             <span className="text-[10px] font-medium">{label}</span>
