@@ -71,3 +71,24 @@
     background: linear-gradient(135deg, #141428, #1a1a35);
   }
 }
+
+
+/* SCROLL PERSONALIZADO */
+.custom-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: #052e16;
+  /* verde bem escuro */
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: #22c55e;
+  /* verde claro (tailwind green-500) */
+  border-radius: 999px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #22c55e, #4ade80);
+}
