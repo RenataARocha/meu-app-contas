@@ -9,16 +9,17 @@ import { useState } from "react";
 import { ChevronDown, CheckCircle2, Circle, Trash2, Pencil } from "lucide-react";
 import { cn, formatarMoeda, formatarData, statusVencimento } from "@/lib/utils";
 import { BancoIcon } from "./BancoIcon";
-import type { Conta } from "@/types/contas";
+import type { Conta } from "@/types/conta";
 
 interface ContaCardProps {
     conta: Conta;
     onMarcarPago: (id: string, pago: boolean) => void;
     onExcluir: (id: string) => void;
     onEditar: (conta: Conta) => void;
+    somenteLeitura?: boolean; // ← adiciona isso
 }
 
-export function ContaCard({ conta, onMarcarPago, onExcluir, onEditar }: ContaCardProps) {
+export function ContaCard({ conta, onMarcarPago, onExcluir, onEditar, somenteLeitura }: ContaCardProps) {
     const [expandido, setExpandido] = useState(false);
     const status = statusVencimento(conta.diaVencimento);
 
@@ -38,7 +39,7 @@ export function ContaCard({ conta, onMarcarPago, onExcluir, onEditar }: ContaCar
         >
             {/* Linha principal — sempre visível */}
             <div
-                className="flex items-center gap-3 p-4 cursor-pointer"
+                className="flex items-center gap-3 p-4 cursor-pointer "
                 onClick={() => setExpandido(!expandido)}
             >
                 {/* Checkbox */}
@@ -127,26 +128,28 @@ export function ContaCard({ conta, onMarcarPago, onExcluir, onEditar }: ContaCar
                     </div>
 
                     {/* Ações */}
-                    <div className="flex gap-2 pt-2">
-                        <button
-                            onClick={() => onEditar(conta)}
-                            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl
+                    {!somenteLeitura && (
+                        <div className="flex gap-2 pt-2">
+                            <button
+                                onClick={() => onEditar(conta)}
+                                className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl
                          bg-dark-600 text-xs text-muted-foreground hover:text-foreground
                          hover:bg-dark-500 transition-all"
-                        >
-                            <Pencil size={13} />
-                            Editar
-                        </button>
-                        <button
-                            onClick={() => onExcluir(conta.id)}
-                            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl
+                            >
+                                <Pencil size={13} />
+                                Editar
+                            </button>
+                            <button
+                                onClick={() => onExcluir(conta.id)}
+                                className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl
                          bg-destructive/10 text-xs text-destructive hover:bg-destructive/20
                          transition-all"
-                        >
-                            <Trash2 size={13} />
-                            Excluir
-                        </button>
-                    </div>
+                            >
+                                <Trash2 size={13} />
+                                Excluir
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

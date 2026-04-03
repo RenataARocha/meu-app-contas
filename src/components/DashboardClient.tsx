@@ -13,7 +13,7 @@ import { ContaForm } from "./ContaForm";
 import { ModalPagamento } from "./ModalPagamento";
 import { PrimeiroAcesso } from "./PrimeiroAcesso";
 import { nomeMes } from "@/lib/utils";
-import type { Conta } from "@/types/contas";
+import type { Conta } from "@/types/conta";
 import type { Usuario } from "@/types/usuario";
 
 interface Props {
@@ -95,7 +95,7 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
     }
 
     return (
-        <div className="space-y-5">
+        <div className="flex flex-col h-[100dvh] overflow-hidden bg-dark-900">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
@@ -122,14 +122,14 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                             value={busca}
                             onChange={(e) => setBusca(e.target.value)}
                             placeholder="Buscar conta..."
-                            className="w-full pl-9 pr-4 py-2.5 bg-dark-700 border border-white/5 rounded-xl
+                            className="w-full pl-9 pr-4 py-2.5 mt-3 bg-dark-700 border border-white/5 rounded-xl
                          text-sm placeholder:text-muted-foreground focus:outline-none
                          focus:ring-1 focus:ring-brand-500"
                         />
                     </div>
                     <button
                         onClick={() => setMostrarFiltros(!mostrarFiltros)}
-                        className={`p-2.5 rounded-xl border transition-all ${mostrarFiltros
+                        className={`p-2.5 mt-3 rounded-xl border transition-all ${mostrarFiltros
                             ? "bg-brand-500/10 border-brand-500/30 text-brand-400"
                             : "bg-dark-700 border-white/5 text-muted-foreground"
                             }`}
@@ -165,7 +165,7 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
             {/* Botão adicionar */}
             <button
                 onClick={() => { setContaEditando(null); setModalForm(true); }}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl
+                className="w-full flex items-center justify-center gap-2 py-3 mt-3 rounded-2xl
                    bg-brand-gradient text-sm font-semibold text-white
                    hover:opacity-90 active:scale-[0.98] transition-all glow-green"
             >
@@ -174,7 +174,7 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
             </button>
 
             {/* Lista de contas */}
-            <div className="space-y-3">
+            <div className="flex-1 overflow-y-auto px-4 pb-24 space-y-3 custom-scroll mt-4">
                 {contasFiltradas.length === 0 ? (
                     <div className="text-center py-10 text-muted-foreground">
                         <p className="text-4xl mb-3">📋</p>
