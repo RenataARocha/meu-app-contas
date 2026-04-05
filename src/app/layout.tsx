@@ -1,17 +1,14 @@
-// src/app/layout.tsx
-// Estrutura base de TODAS as páginas
-// NavBar fica aqui → aparece em todo lugar
-
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { NavBar } from "@/components/NavBar";
+import { TemaProvider } from "@/lib/tema";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "MinhasConta$ — Controle de pagamentos",
+  title: "MinhasConta$",
   description: "Gerencie suas contas mensais com estilo",
-  manifest: "/manifest.json", // PWA
-  themeColor: "#0a0a0f",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
 };
 
 export default function RootLayout({
@@ -20,15 +17,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR" className="dark">
-      <body>
-        {/* Conteúdo da página */}
-        <main className="max-w-md mx-auto min-h-screen pb-24 px-4 pt-6">
+    <html lang="pt-BR" className={`dark ${inter.variable}`} data-tema="navy">
+      <body className="antialiased bg-background min-h-screen">
+        <TemaProvider>
           {children}
-        </main>
-
-        {/* NavBar sempre visível no bottom */}
-        <NavBar />
+          <div className="md:hidden">
+            <NavBar />
+          </div>
+        </TemaProvider>
       </body>
     </html>
   );
