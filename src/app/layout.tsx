@@ -1,14 +1,37 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { NavBar } from "@/components/NavBar";
 import { TemaProvider } from "@/lib/tema";
+import { PwaRegistro } from "@/components/PwaRegistro";
+
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
+export const viewport: Viewport = {
+  themeColor: "#060d18",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export const metadata: Metadata = {
   title: "MinhasConta$",
-  description: "Gerencie suas contas mensais com estilo",
+  description: "Controle suas contas mensais com estilo",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "MinhasConta$",
+  },
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
 };
 
 export default function RootLayout({
@@ -20,6 +43,7 @@ export default function RootLayout({
     <html lang="pt-BR" className={`dark ${inter.variable}`} data-tema="navy">
       <body className="antialiased bg-background min-h-screen">
         <TemaProvider>
+          <PwaRegistro />
           {children}
           <div className="md:hidden">
             <NavBar />
