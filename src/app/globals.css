@@ -4,24 +4,25 @@
 
 @layer base {
   :root {
-    --background: 222 47% 5%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 8%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 8%;
-    --popover-foreground: 210 40% 98%;
+    /* Navy — azul escuro profundo com acentos verdes */
+    --background: 220 40% 6%;
+    --foreground: 210 40% 96%;
+    --card: 220 35% 9%;
+    --card-foreground: 210 40% 96%;
+    --popover: 220 35% 9%;
+    --popover-foreground: 210 40% 96%;
     --primary: 142 71% 45%;
     --primary-foreground: 144 61% 10%;
-    --secondary: 222 47% 12%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 222 47% 12%;
-    --muted-foreground: 215 20% 55%;
-    --accent: 222 47% 15%;
-    --accent-foreground: 210 40% 98%;
+    --secondary: 220 35% 13%;
+    --secondary-foreground: 210 40% 96%;
+    --muted: 220 35% 13%;
+    --muted-foreground: 215 20% 52%;
+    --accent: 220 35% 16%;
+    --accent-foreground: 210 40% 96%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
-    --border: 222 47% 15%;
-    --input: 222 47% 12%;
+    --border: 220 35% 16%;
+    --input: 220 35% 13%;
     --ring: 142 71% 45%;
     --radius: 0.75rem;
   }
@@ -36,17 +37,31 @@
 }
 
 @layer utilities {
+
+  /* Cards com borda azul sutil — visual navy */
   .glass-card {
-    background-color: hsl(222, 47%, 8%);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background-color: hsl(220, 35%, 9%);
+    border: 1px solid rgba(99, 179, 237, 0.08);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Versão com brilho azul suave para cards em destaque */
+  .glass-card-blue {
+    background-color: hsl(220, 40%, 11%);
+    border: 1px solid rgba(99, 179, 237, 0.12);
+    box-shadow: 0 0 0 1px rgba(99, 179, 237, 0.05), 0 4px 12px rgba(0, 0, 0, 0.3);
   }
 
   .glow-green {
-    box-shadow: 0 0 20px rgba(34, 197, 94, 0.15);
+    box-shadow: 0 0 24px rgba(34, 197, 94, 0.18);
   }
 
   .glow-red {
     box-shadow: 0 0 20px rgba(239, 68, 68, 0.15);
+  }
+
+  .glow-blue {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
   }
 
   .text-gradient-green {
@@ -63,32 +78,214 @@
     background-clip: text;
   }
 
+  .text-gradient-blue {
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
   .bg-brand-gradient {
     background: linear-gradient(135deg, #22c55e, #16a34a);
   }
 
+  .bg-navy-gradient {
+    background: linear-gradient(135deg, #1e3a5f, #0f2744);
+  }
+
   .bg-card-gradient {
-    background: linear-gradient(135deg, #141428, #1a1a35);
+    background: linear-gradient(135deg, hsl(220, 40%, 10%), hsl(220, 40%, 13%));
   }
 }
 
-
-/* SCROLL PERSONALIZADO */
-.custom-scroll::-webkit-scrollbar {
-  width: 6px;
+/* ── Scrollbar personalizada — verde sobre navy ── */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
 }
 
-.custom-scroll::-webkit-scrollbar-track {
-  background: #052e16;
-  /* verde bem escuro */
+::-webkit-scrollbar-track {
+  background: hsl(220, 40%, 7%);
+  border-radius: 10px;
 }
 
-.custom-scroll::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
+  background: #15803d;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
   background: #22c55e;
-  /* verde claro (tailwind green-500) */
-  border-radius: 999px;
 }
 
-.custom-scroll::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #22c55e, #4ade80);
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #15803d hsl(220, 40%, 7%);
+}
+
+
+/* ── TEMA NAVY (padrão) ── */
+[data-tema="navy"] {
+  --background: 220 40% 6%;
+  --card: 220 35% 9%;
+  --card-foreground: 210 40% 96%;
+  --secondary: 220 35% 13%;
+  --muted: 220 35% 13%;
+  --muted-foreground: 215 20% 52%;
+  --accent: 220 35% 16%;
+  --border: 220 35% 16%;
+  --input: 220 35% 13%;
+}
+
+[data-tema="navy"] .glass-card {
+  background-color: hsl(220, 35%, 9%);
+  border: 1px solid rgba(96, 165, 250, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+[data-tema="navy"] .bg-dark-900 {
+  background-color: #060d18 !important;
+}
+
+[data-tema="navy"] .bg-dark-800 {
+  background-color: #0a1628 !important;
+}
+
+[data-tema="navy"] .bg-dark-700 {
+  background-color: #0f2040 !important;
+}
+
+[data-tema="navy"] .bg-dark-600 {
+  background-color: #152a52 !important;
+}
+
+/* ── TEMA MIDNIGHT GREEN ── */
+[data-tema="midnight"] {
+  --background: 150 40% 3%;
+  --foreground: 150 30% 96%;
+  --card: 150 35% 6%;
+  --card-foreground: 150 30% 96%;
+  --popover: 150 35% 6%;
+  --popover-foreground: 150 30% 96%;
+  --secondary: 150 30% 9%;
+  --secondary-foreground: 150 30% 96%;
+  --muted: 150 30% 9%;
+  --muted-foreground: 150 15% 52%;
+  --accent: 150 30% 12%;
+  --accent-foreground: 150 30% 96%;
+  --border: 150 30% 12%;
+  --input: 150 30% 9%;
+  --ring: 160 84% 39%;
+  --primary: 160 84% 39%;
+}
+
+[data-tema="midnight"] .glass-card {
+  background-color: hsl(150, 35%, 6%);
+  border: 1px solid rgba(16, 185, 129, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+[data-tema="midnight"] .bg-dark-900 {
+  background-color: #030a08 !important;
+}
+
+[data-tema="midnight"] .bg-dark-800 {
+  background-color: #051510 !important;
+}
+
+[data-tema="midnight"] .bg-dark-700 {
+  background-color: #071a12 !important;
+}
+
+[data-tema="midnight"] .bg-dark-600 {
+  background-color: #0a2018 !important;
+}
+
+[data-tema="midnight"] .text-gradient-green {
+  background: linear-gradient(135deg, #34d399, #059669);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-tema="midnight"] .bg-brand-gradient {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+[data-tema="midnight"] .glow-green {
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.2);
+}
+
+[data-tema="midnight"] ::-webkit-scrollbar-thumb {
+  background: #059669;
+}
+
+[data-tema="midnight"] ::-webkit-scrollbar-thumb:hover {
+  background: #10b981;
+}
+
+/* ── TEMA ROXO ── */
+[data-tema="roxo"] {
+  --background: 270 25% 5%;
+  --foreground: 270 20% 96%;
+  --card: 270 22% 8%;
+  --card-foreground: 270 20% 96%;
+  --popover: 270 22% 8%;
+  --popover-foreground: 270 20% 96%;
+  --secondary: 270 20% 12%;
+  --secondary-foreground: 270 20% 96%;
+  --muted: 270 20% 12%;
+  --muted-foreground: 270 10% 52%;
+  --accent: 270 20% 15%;
+  --accent-foreground: 270 20% 96%;
+  --border: 270 20% 15%;
+  --input: 270 20% 11%;
+  --ring: 271 91% 65%;
+  --primary: 271 91% 65%;
+}
+
+[data-tema="roxo"] .glass-card {
+  background-color: hsl(270, 22%, 8%);
+  border: 1px solid rgba(168, 85, 247, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+[data-tema="roxo"] .bg-dark-900 {
+  background-color: #0d0a14 !important;
+}
+
+[data-tema="roxo"] .bg-dark-800 {
+  background-color: #130f1e !important;
+}
+
+[data-tema="roxo"] .bg-dark-700 {
+  background-color: #180d28 !important;
+}
+
+[data-tema="roxo"] .bg-dark-600 {
+  background-color: #1e1030 !important;
+}
+
+[data-tema="roxo"] .bg-brand-gradient {
+  background: linear-gradient(135deg, #a855f7, #7c3aed);
+}
+
+[data-tema="roxo"] .glow-green {
+  box-shadow: 0 0 24px rgba(168, 85, 247, 0.2);
+}
+
+[data-tema="roxo"] .text-gradient-green {
+  background: linear-gradient(135deg, #c084fc, #7c3aed);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-tema="roxo"] ::-webkit-scrollbar-thumb {
+  background: #7c3aed;
+}
+
+[data-tema="roxo"] ::-webkit-scrollbar-thumb:hover {
+  background: #a855f7;
 }
