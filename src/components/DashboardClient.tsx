@@ -1,20 +1,21 @@
-// src/components/DashboardClient.tsx
-// Client Component principal: toda interatividade fica aqui
-// Recebe dados iniciais do servidor (sem loading no primeiro render)
-
 "use client";
 
 import { useState } from "react";
-import { Plus, Search, SlidersHorizontal } from "lucide-react";
+import { Plus, Search, SlidersHorizontal, Menu, X, Home, History, BarChart2, User } from "lucide-react";
+import Link from "next/link";
 import { AvatarUsuario } from "./AvatarUsuario";
 import { Resumo } from "./Resumo";
 import { ContaCard } from "./ContaCard";
 import { ContaForm } from "./ContaForm";
 import { ModalPagamento } from "./ModalPagamento";
 import { PrimeiroAcesso } from "./PrimeiroAcesso";
-import { nomeMes } from "@/lib/utils";
+import { nomeMes, cn } from "@/lib/utils";
 import type { Conta } from "@/types/conta";
 import type { Usuario } from "@/types/usuario";
+import { useTema } from "@/lib/tema";
+import { Moon, Sun } from "lucide-react";
+import { SeletorTema } from "./SeletorTema";
+import { Palette } from "lucide-react";
 
 interface Props {
     usuarioInicial: Usuario | null;
@@ -22,6 +23,13 @@ interface Props {
     mes: number;
     ano: number;
 }
+
+const navLinks = [
+    { href: "/", label: "Início", icon: Home },
+    { href: "/historico", label: "Histórico", icon: History },
+    { href: "/relatorio", label: "Relatório", icon: BarChart2 },
+    { href: "/perfil", label: "Perfil", icon: User },
+];
 
 export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Props) {
     const [usuario, setUsuario] = useState<Usuario | null>(usuarioInicial);
@@ -32,14 +40,12 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
     const [mostrarFiltros, setMostrarFiltros] = useState(false);
     const [modalForm, setModalForm] = useState(false);
     const [contaEditando, setContaEditando] = useState<Conta | null>(null);
-    const [modalPagamento, setModalPagamento] = useState<string | null>(null); // id da conta
+    const [modalPagamento, setModalPagamento] = useState<string | null>(null);
+    const [sidebarAberta, setSidebarAberta] = useState(false);
+    const [mostrarTema, setMostrarTema] = useState(false);
 
-    // Se não tem usuário, mostra tela de primeiro acesso
-    if (!usuario) {
-        return <PrimeiroAcesso onCriado={setUsuario} />;
-    }
+    if (!usuario) return <PrimeiroAcesso onCriado={setUsuario} />;
 
-    // Filtra as contas conforme busca e filtros
     const contasFiltradas = contas.filter((c) => {
         const buscaNome = c.nome.toLowerCase().includes(busca.toLowerCase());
         const buscaBanco = c.banco.toLowerCase().includes(filtroBanco.toLowerCase());
@@ -50,14 +56,10 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
         return buscaNome && buscaBanco && matchStatus;
     });
 
-    // Cálculos do resumo
     const total = contas.reduce((s, c) => s + c.valor, 0);
     const pago = contas.filter((c) => c.pago).reduce((s, c) => s + c.valor, 0);
-
-    // Hora do dia → saudação
     const hora = new Date().getHours();
-    const saudacao =
-        hora < 12 ? "Bom dia" : hora < 18 ? "Boa tarde" : "Boa noite";
+    const saudacao = hora < 12 ? "Bom dia" : hora < 18 ? "Boa tarde" : "Boa noite";
 
     async function recarregarContas() {
         const res = await fetch(`/api/contas?mes=${mes}&ano=${ano}&usuarioId=${usuario!.id}`);
@@ -71,88 +73,325 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
         setContas((prev) => prev.filter((c) => c.id !== id));
     }
 
-    function handleMarcarPago(id: string, pago: boolean) {
-        if (pago) {
-            // Abre modal para informar a data de pagamento
-            setModalPagamento(id);
-        } else {
-            // Desmarcar — não precisa de data
-            confirmarPagamento(id, false, null);
-        }
+    function handleMarcarPago(id: string, novoPago: boolean) {
+        if (novoPago) setModalPagamento(id);
+        else confirmarPagamento(id, false, null);
     }
 
-    async function confirmarPagamento(id: string, pago: boolean, data: string | null) {
+    async function confirmarPagamento(id: string, novoPago: boolean, data: string | null) {
         await fetch(`/api/contas/${id}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                pago,
-                dataPagamento: pago && data ? new Date(data).toISOString() : null,
+                pago: novoPago,
+                dataPagamento: novoPago && data ? new Date(data).toISOString() : null,
             }),
         });
         await recarregarContas();
         setModalPagamento(null);
     }
 
+    const inputClass = "bg-dark-700 border border-white/5 rounded-xl text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-brand-500";
+
     return (
-        <div className="flex flex-col h-[100dvh] overflow-hidden bg-dark-900">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <p className="text-xs text-muted-foreground">{saudacao},</p>
-                    <h1 className="text-xl font-semibold text-foreground capitalize">
-                        {usuario.nome.split(" ")[0]} 👋
-                    </h1>
-                    <p className="text-xs text-muted-foreground mt-0.5 capitalize">
-                        {nomeMes(mes, ano)}
-                    </p>
-                </div>
-                <AvatarUsuario genero={usuario.genero as "masculino" | "feminino" | "outro"} tamanho={46} />
-            </div>
+        <div className="min-h-screen bg-dark-900">
 
-            {/* Resumo financeiro */}
-            <Resumo total={total} pago={pago} pendente={total - pago} />
+            {/* ── OVERLAY SIDEBAR ── */}
+            {sidebarAberta && (
+                <div
+                    className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+                    onClick={() => setSidebarAberta(false)}
+                    aria-hidden="true"
+                />
+            )}
 
-            {/* Barra de busca + filtros */}
-            <div className="space-y-2">
-                <div className="flex gap-2">
-                    <div className="flex-1 relative">
-                        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                        <input
-                            value={busca}
-                            onChange={(e) => setBusca(e.target.value)}
-                            placeholder="Buscar conta..."
-                            className="w-full pl-9 pr-4 py-2.5 mt-3 bg-dark-700 border border-white/5 rounded-xl
-                         text-sm placeholder:text-muted-foreground focus:outline-none
-                         focus:ring-1 focus:ring-brand-500"
+            {/* ── SIDEBAR ── */}
+            <aside
+                id="sidebar-menu"
+                role="navigation"
+                aria-label="Menu principal"
+                aria-hidden={!sidebarAberta}
+                className={cn(
+                    "fixed top-0 left-0 h-full z-50 w-64 bg-dark-800 border-r border-white/5",
+                    "flex flex-col transition-transform duration-300",
+                    sidebarAberta ? "translate-x-0" : "-translate-x-full"
+                )}
+            >
+                <div className="flex items-center justify-between p-5 border-b border-white/5">
+                    <div className="flex items-center gap-3">
+                        <span className="text-xs text-muted-foreground capitalize">
+                            {nomeMes(mes, ano)}
+                        </span>
+                        <div className="relative">
+                            <button
+                                onClick={() => setMostrarTema(!mostrarTema)}
+                                aria-label="Selecionar tema"
+                                aria-expanded={mostrarTema}
+                                className="p-2 rounded-xl hover:bg-white/5 text-muted-foreground
+               hover:text-foreground transition-all focus-visible:outline-none
+               focus-visible:ring-2 focus-visible:ring-brand-500"
+                            >
+                                <Palette size={18} aria-hidden="true" />
+                            </button>
+
+                            {mostrarTema && (
+                                <>
+                                    <div
+                                        className="fixed inset-0 z-40"
+                                        onClick={() => setMostrarTema(false)}
+                                    />
+                                    <div className="absolute top-full right-0 mt-2 w-52 bg-dark-800 border border-white/10 rounded-2xl shadow-2xl z-50">
+                                        <SeletorTema aoFechar={() => setMostrarTema(false)} />
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                        <AvatarUsuario
+                            genero={usuario.genero as "masculino" | "feminino" | "outro"}
+                            tamanho={38}
                         />
                     </div>
                     <button
-                        onClick={() => setMostrarFiltros(!mostrarFiltros)}
-                        className={`p-2.5 mt-3 rounded-xl border transition-all ${mostrarFiltros
-                            ? "bg-brand-500/10 border-brand-500/30 text-brand-400"
-                            : "bg-dark-700 border-white/5 text-muted-foreground"
-                            }`}
+                        onClick={() => setSidebarAberta(false)}
+                        aria-label="Fechar menu"
+                        className="text-muted-foreground hover:text-foreground p-1 rounded-lg hover:bg-white/5 transition-colors"
                     >
-                        <SlidersHorizontal size={18} />
+                        <X size={18} aria-hidden="true" />
                     </button>
                 </div>
 
-                {mostrarFiltros && (
-                    <div className="flex gap-2">
+                <nav className="flex-1 p-4 space-y-1" aria-label="Páginas do app">
+                    {navLinks.map(({ href, label, icon: Icon }) => (
+                        <Link
+                            key={href}
+                            href={href}
+                            onClick={() => setSidebarAberta(false)}
+                            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm
+                         text-muted-foreground hover:text-foreground hover:bg-white/5
+                         transition-all focus-visible:outline-none focus-visible:ring-2
+                         focus-visible:ring-brand-500"
+                        >
+                            <Icon size={18} aria-hidden="true" />
+                            {label}
+                        </Link>
+                    ))}
+                </nav>
+
+                <div className="p-4 border-t border-white/5">
+                    <p className="text-xs text-muted-foreground text-center">MinhasConta$ v1.0</p>
+                </div>
+            </aside>
+
+            {/* ── HEADER DESKTOP ── */}
+            <header
+                className="hidden md:flex items-center justify-between px-8 py-4 border-b border-white/5 bg-dark-800/80 backdrop-blur-sm sticky top-0 z-30"
+                role="banner"
+            >
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => setSidebarAberta(true)}
+                        aria-label="Abrir menu de navegação"
+                        aria-expanded={sidebarAberta}
+                        aria-controls="sidebar-menu"
+                        className="p-2 rounded-xl hover:bg-white/5 text-muted-foreground hover:text-foreground transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                    >
+                        <Menu size={20} aria-hidden="true" />
+                    </button>
+                    <div>
+                        <p className="text-xs text-muted-foreground">{saudacao},</p>
+                        <p className="text-lg font-semibold capitalize">
+                            {usuario.nome.split(" ")[0]} 👋
+                        </p>
+                    </div>
+                </div>
+
+                {/* Busca desktop */}
+                <div className="relative w-72">
+                    <label htmlFor="busca-desktop" className="sr-only">Buscar conta</label>
+                    <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+                    <input
+                        id="busca-desktop"
+                        value={busca}
+                        onChange={(e) => setBusca(e.target.value)}
+                        placeholder="Buscar conta..."
+                        className={`w-full pl-9 pr-4 py-2 ${inputClass}`}
+                    />
+                </div>
+
+                <div className="flex items-center gap-3">
+                    <span className="text-xs text-muted-foreground capitalize">
+                        {nomeMes(mes, ano)}
+                    </span>
+                    <div className="relative">
+                        <button
+                            onClick={() => setMostrarTema(!mostrarTema)}
+                            aria-label="Selecionar tema"
+                            aria-expanded={mostrarTema}
+                            className="p-2 rounded-xl hover:bg-white/5 text-muted-foreground
+               hover:text-foreground transition-all focus-visible:outline-none
+               focus-visible:ring-2 focus-visible:ring-brand-500"
+                        >
+                            <Palette size={18} aria-hidden="true" />
+                        </button>
+
+                        {mostrarTema && (
+                            <>
+                                <div
+                                    className="fixed inset-0 z-40"
+                                    onClick={() => setMostrarTema(false)}
+                                />
+                                <div className="absolute top-full right-0 mt-2 w-52 bg-dark-800 border border-white/10 rounded-2xl shadow-2xl z-50">
+                                    <SeletorTema aoFechar={() => setMostrarTema(false)} />
+                                </div>
+                            </>
+                        )}
+                    </div>
+                    <AvatarUsuario
+                        genero={usuario.genero as "masculino" | "feminino" | "outro"}
+                        tamanho={38}
+                    />
+                </div>
+            </header>
+
+            {/* ── CONTEÚDO PRINCIPAL ── */}
+            <main
+                id="conteudo-principal"
+                className="max-w-5xl mx-auto px-4 md:px-8 pt-6 pb-28 md:pb-10"
+                aria-label="Dashboard de contas"
+            >
+                {/* Pular navegação — acessibilidade */}
+                <a
+                    href="#lista-contas"
+                    className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4
+                focus:z-50 focus:px-4 focus:py-2 focus:bg-brand-500 focus:text-white
+                focus:rounded-lg focus:text-sm"
+                >
+                    Pular para lista de contas
+                </a>
+
+                {/* Header mobile */}
+                <div className="flex items-center justify-between mb-5 md:hidden">
+                    <div>
+                        <p className="text-xs text-muted-foreground">{saudacao},</p>
+                        <h1 className="text-xl font-semibold capitalize">
+                            {usuario.nome.split(" ")[0]} 👋
+                        </h1>
+                        <p className="text-xs text-muted-foreground mt-0.5 capitalize">
+                            {nomeMes(mes, ano)}
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => setSidebarAberta(true)}
+                            aria-label="Abrir menu de navegação"
+                            aria-expanded={sidebarAberta}
+                            aria-controls="sidebar-menu"
+                            className="p-2 rounded-xl hover:bg-white/5 text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                        >
+                            <Menu size={20} aria-hidden="true" />
+                        </button>
+                        <AvatarUsuario
+                            genero={usuario.genero as "masculino" | "feminino" | "outro"}
+                            tamanho={42}
+                        />
+                    </div>
+                </div>
+
+                {/* Resumo financeiro */}
+                <section aria-label="Resumo financeiro do mês" className="mb-5">
+                    <Resumo total={total} pago={pago} pendente={total - pago} />
+                </section>
+
+                {/* Filtros + botão */}
+                <section aria-label="Filtros e ações" className="flex flex-col md:flex-row gap-3 mb-5">
+
+                    {/* Busca mobile */}
+                    <div className="flex gap-2 md:hidden">
+                        <div className="flex-1 relative">
+                            <label htmlFor="busca-mobile" className="sr-only">Buscar conta</label>
+                            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+                            <input
+                                id="busca-mobile"
+                                value={busca}
+                                onChange={(e) => setBusca(e.target.value)}
+                                placeholder="Buscar conta..."
+                                className={`w-full pl-9 pr-4 py-2.5 ${inputClass}`}
+                            />
+                        </div>
+                        <button
+                            onClick={() => setMostrarFiltros(!mostrarFiltros)}
+                            aria-label={mostrarFiltros ? "Ocultar filtros" : "Mostrar filtros"}
+                            aria-expanded={mostrarFiltros}
+                            className={cn(
+                                "p-2.5 rounded-xl border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500",
+                                mostrarFiltros
+                                    ? "bg-brand-500/10 border-brand-500/30 text-brand-400"
+                                    : "bg-dark-700 border-white/5 text-muted-foreground"
+                            )}
+                        >
+                            <SlidersHorizontal size={18} aria-hidden="true" />
+                        </button>
+                    </div>
+
+                    {/* Filtros desktop */}
+                    <div className="hidden md:flex gap-3 flex-1" role="group" aria-label="Filtros de contas">
+                        <label htmlFor="filtro-banco" className="sr-only">Filtrar por banco</label>
                         <input
+                            id="filtro-banco"
                             value={filtroBanco}
                             onChange={(e) => setFiltroBanco(e.target.value)}
                             placeholder="Filtrar banco..."
-                            className="flex-1 px-3 py-2 bg-dark-700 border border-white/5 rounded-xl
-                         text-xs placeholder:text-muted-foreground focus:outline-none
-                         focus:ring-1 focus:ring-brand-500"
+                            className={`px-4 py-2.5 w-48 ${inputClass}`}
                         />
+                        <label htmlFor="filtro-status" className="sr-only">Filtrar por status</label>
                         <select
+                            id="filtro-status"
                             value={filtroStatus}
                             onChange={(e) => setFiltroStatus(e.target.value as "todos" | "pendente" | "pago")}
-                            className="px-3 py-2 bg-dark-700 border border-white/5 rounded-xl
-                         text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-brand-500"
+                            className={`px-4 py-2.5 ${inputClass} text-foreground`}
+                        >
+                            <option value="todos">Todos</option>
+                            <option value="pendente">Pendente</option>
+                            <option value="pago">Pago</option>
+                        </select>
+                    </div>
+
+                    <button
+                        onClick={() => { setContaEditando(null); setModalForm(true); }}
+                        aria-label="Adicionar nova conta"
+                        className="flex items-center justify-center gap-2 py-2.5 px-6 rounded-2xl
+                       bg-brand-gradient text-sm font-semibold text-white
+                       hover:opacity-90 active:scale-[0.98] transition-all glow-green
+                       md:ml-auto focus-visible:outline-none focus-visible:ring-2
+                       focus-visible:ring-brand-500 focus-visible:ring-offset-2
+                       focus-visible:ring-offset-dark-900"
+                    >
+                        <Plus size={18} aria-hidden="true" />
+                        Adicionar conta
+                    </button>
+                </section>
+
+                {/* Filtros mobile expansíveis */}
+                {mostrarFiltros && (
+                    <div
+                        className="flex gap-2 mb-4 md:hidden"
+                        role="group"
+                        aria-label="Filtros adicionais"
+                    >
+                        <label htmlFor="filtro-banco-mobile" className="sr-only">Filtrar por banco</label>
+                        <input
+                            id="filtro-banco-mobile"
+                            value={filtroBanco}
+                            onChange={(e) => setFiltroBanco(e.target.value)}
+                            placeholder="Filtrar banco..."
+                            className={`flex-1 px-3 py-2 text-xs ${inputClass}`}
+                        />
+                        <label htmlFor="filtro-status-mobile" className="sr-only">Filtrar por status</label>
+                        <select
+                            id="filtro-status-mobile"
+                            value={filtroStatus}
+                            onChange={(e) => setFiltroStatus(e.target.value as "todos" | "pendente" | "pago")}
+                            className={`px-3 py-2 text-xs ${inputClass} text-foreground`}
                         >
                             <option value="todos">Todos</option>
                             <option value="pendente">Pendente</option>
@@ -160,58 +399,62 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                         </select>
                     </div>
                 )}
-            </div>
 
-            {/* Botão adicionar */}
-            <button
-                onClick={() => { setContaEditando(null); setModalForm(true); }}
-                className="w-full flex items-center justify-center gap-2 py-3 mt-3 rounded-2xl
-                   bg-brand-gradient text-sm font-semibold text-white
-                   hover:opacity-90 active:scale-[0.98] transition-all glow-green"
-            >
-                <Plus size={18} />
-                Adicionar conta
-            </button>
-
-            {/* Lista de contas */}
-            <div className="flex-1 overflow-y-auto px-4 pb-24 space-y-3 custom-scroll mt-4">
-                {contasFiltradas.length === 0 ? (
-                    <div className="text-center py-10 text-muted-foreground">
-                        <p className="text-4xl mb-3">📋</p>
-                        <p className="text-sm">Nenhuma conta encontrada</p>
+                {/* Lista de contas */}
+                <section
+                    id="lista-contas"
+                    aria-label={`Lista de contas — ${contasFiltradas.length} encontrada${contasFiltradas.length !== 1 ? "s" : ""}`}
+                    aria-live="polite"
+                    aria-atomic="false"
+                >
+                    <div className="overflow-y-auto pr-1" style={{ maxHeight: "calc(100vh - 420px)" }}>
+                        {contasFiltradas.length === 0 ? (
+                            <div className="text-center py-16 text-muted-foreground" role="status">
+                                <p className="text-5xl mb-4" aria-hidden="true">📋</p>
+                                <p className="text-sm">Nenhuma conta encontrada</p>
+                            </div>
+                        ) : (
+                            <ul
+                                className="grid grid-cols-1 md:grid-cols-2 gap-3 pb-4 list-none"
+                                aria-label="Contas do mês"
+                            >
+                                {contasFiltradas.map((conta) => (
+                                    <li key={conta.id}>
+                                        <ContaCard
+                                            conta={conta}
+                                            onMarcarPago={handleMarcarPago}
+                                            onExcluir={handleExcluir}
+                                            onEditar={(c) => { setContaEditando(c); setModalForm(true); }}
+                                        />
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
                     </div>
-                ) : (
-                    contasFiltradas.map((conta) => (
-                        <ContaCard
-                            key={conta.id}
-                            conta={conta}
-                            onMarcarPago={handleMarcarPago}
-                            onExcluir={handleExcluir}
-                            onEditar={(c) => { setContaEditando(c); setModalForm(true); }}
-                        />
-                    ))
-                )}
-            </div>
+                </section>
+            </main>
 
-            {/* Modal formulário */}
-            {modalForm && (
-                <ContaForm
-                    conta={contaEditando}
-                    usuarioId={usuario.id}
-                    mes={mes}
-                    ano={ano}
-                    onFechar={() => { setModalForm(false); setContaEditando(null); }}
-                    onSalvo={recarregarContas}
-                />
-            )}
-
-            {/* Modal pagamento */}
-            {modalPagamento && (
-                <ModalPagamento
-                    onFechar={() => setModalPagamento(null)}
-                    onConfirmar={(data) => confirmarPagamento(modalPagamento, true, data)}
-                />
-            )}
-        </div>
+            {/* Modais */}
+            {
+                modalForm && (
+                    <ContaForm
+                        conta={contaEditando}
+                        usuarioId={usuario.id}
+                        mes={mes}
+                        ano={ano}
+                        onFechar={() => { setModalForm(false); setContaEditando(null); }}
+                        onSalvo={recarregarContas}
+                    />
+                )
+            }
+            {
+                modalPagamento && (
+                    <ModalPagamento
+                        onFechar={() => setModalPagamento(null)}
+                        onConfirmar={(data) => confirmarPagamento(modalPagamento, true, data)}
+                    />
+                )
+            }
+        </div >
     );
 }
