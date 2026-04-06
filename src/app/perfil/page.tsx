@@ -47,12 +47,11 @@ export default function PerfilPage() {
     const generoParaAvatar = (generoAtual || usuario?.genero || "outro") as "masculino" | "feminino" | "outro";
 
     return (
-        <main
-            className="max-w-md mx-auto px-4 md:px-8 pt-6 pb-28 md:pb-10"
-            aria-label="Configurações de perfil"
-        >
+        <main className="max-w-md mx-auto px-4 md:px-8 pt-6 pb-28 md:pb-10"
+            aria-label="Configurações de perfil">
             <div className="space-y-6">
-                <div>
+
+                <div className="animate-slide-up" style={{ animationFillMode: "both" }}>
                     <h1 className="text-xl font-semibold">Perfil</h1>
                     <p className="text-xs text-muted-foreground mt-0.5">
                         Personalize sua experiência
@@ -60,25 +59,24 @@ export default function PerfilPage() {
                 </div>
 
                 {/* Avatar */}
-                <section aria-label="Prévia do avatar" className="flex flex-col items-center gap-3 py-4">
+                <section aria-label="Prévia do avatar"
+                    className="flex flex-col items-center gap-3 py-4 animate-slide-up"
+                    style={{ animationDelay: "80ms", animationFillMode: "both" }}>
                     <AvatarUsuario genero={generoParaAvatar} tamanho={80} />
                     <p className="text-sm text-muted-foreground" aria-live="polite">
-                        Avatar atual: {generoParaAvatar === "feminino" ? "feminino" : generoParaAvatar === "masculino" ? "masculino" : "neutro"}
+                        Avatar atual: {generoParaAvatar === "feminino" ? "feminino"
+                            : generoParaAvatar === "masculino" ? "masculino" : "neutro"}
                     </p>
                 </section>
 
                 {/* Formulário */}
-                <form
-                    onSubmit={handleSubmit(onSubmit)}
-                    className="space-y-4"
-                    noValidate
-                    aria-label="Formulário de edição de perfil"
-                >
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 animate-slide-up"
+                    style={{ animationDelay: "160ms", animationFillMode: "both" }}
+                    noValidate aria-label="Formulário de edição de perfil">
+
                     <div>
-                        <label
-                            htmlFor="nome-perfil"
-                            className="block text-xs text-muted-foreground mb-1.5"
-                        >
+                        <label htmlFor="nome-perfil"
+                            className="block text-xs text-muted-foreground mb-1.5">
                             Seu nome <span aria-hidden="true">*</span>
                             <span className="sr-only">(obrigatório)</span>
                         </label>
@@ -90,11 +88,10 @@ export default function PerfilPage() {
                             aria-invalid={!!errors.nome}
                             aria-describedby={errors.nome ? "erro-nome" : undefined}
                             className={`w-full px-4 py-3 bg-dark-700 border rounded-xl text-sm
-                placeholder:text-muted-foreground focus:outline-none transition-colors
-                focus:ring-1 ${errors.nome
+              placeholder:text-muted-foreground focus:outline-none transition-colors
+              focus:ring-1 ${errors.nome
                                     ? "border-destructive focus:ring-destructive"
-                                    : "border-white/5 focus:ring-brand-500"
-                                }`}
+                                    : "border-white/5 focus:ring-brand-500"}`}
                         />
                         {errors.nome && (
                             <p id="erro-nome" role="alert" className="text-xs text-destructive mt-1">
@@ -104,21 +101,16 @@ export default function PerfilPage() {
                     </div>
 
                     <div>
-                        <label
-                            htmlFor="genero-perfil"
-                            className="block text-xs text-muted-foreground mb-1.5"
-                        >
+                        <label htmlFor="genero-perfil"
+                            className="block text-xs text-muted-foreground mb-1.5">
                             Gênero <span aria-hidden="true">*</span>
                             <span className="sr-only">(obrigatório)</span>
                         </label>
-                        <select
-                            {...register("genero")}
-                            id="genero-perfil"
+                        <select {...register("genero")} id="genero-perfil"
                             aria-invalid={!!errors.genero}
                             aria-describedby={errors.genero ? "erro-genero" : undefined}
                             className="w-full px-4 py-3 bg-dark-700 border border-white/5 rounded-xl
-                         text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-brand-500"
-                        >
+                       text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-brand-500">
                             <option value="">Selecione...</option>
                             <option value="feminino">Feminino</option>
                             <option value="masculino">Masculino</option>
@@ -131,25 +123,18 @@ export default function PerfilPage() {
                         )}
                     </div>
 
-                    <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        aria-busy={isSubmitting}
+                    <button type="submit" disabled={isSubmitting} aria-busy={isSubmitting}
                         className="w-full py-3.5 rounded-2xl bg-brand-gradient text-white font-semibold
-                       text-sm hover:opacity-90 active:scale-[0.98] transition-all
-                       disabled:opacity-50 glow-green focus-visible:outline-none
-                       focus-visible:ring-2 focus-visible:ring-brand-500
-                       focus-visible:ring-offset-2 focus-visible:ring-offset-dark-900"
-                    >
+                     text-sm hover:opacity-90 active:scale-[0.98] transition-all
+                     disabled:opacity-50 glow-green focus-visible:outline-none
+                     focus-visible:ring-2 focus-visible:ring-brand-500
+                     focus-visible:ring-offset-2 focus-visible:ring-offset-dark-900">
                         {isSubmitting ? "Salvando..." : "Salvar alterações"}
                     </button>
 
                     {salvo && (
-                        <p
-                            role="status"
-                            aria-live="polite"
-                            className="text-center text-sm text-brand-400"
-                        >
+                        <p role="status" aria-live="polite"
+                            className="text-center text-sm text-brand-400 animate-fade-in">
                             ✓ Perfil atualizado com sucesso!
                         </p>
                     )}

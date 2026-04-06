@@ -127,38 +127,17 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                 )}
             >
                 <div className="flex items-center justify-between p-5 border-b border-white/5">
-                    <div className="flex items-center gap-3">
-                        <span className="text-xs text-muted-foreground capitalize">
-                            {nomeMes(mes, ano)}
-                        </span>
-                        <div className="relative">
-                            <button
-                                onClick={() => setMostrarTema(!mostrarTema)}
-                                aria-label="Selecionar tema"
-                                aria-expanded={mostrarTema}
-                                className="p-2 rounded-xl hover:bg-white/5 text-muted-foreground
-               hover:text-foreground transition-all focus-visible:outline-none
-               focus-visible:ring-2 focus-visible:ring-brand-500"
-                            >
-                                <Palette size={18} aria-hidden="true" />
-                            </button>
+                    <div className="flex items-center gap-6 ml-3">
 
-                            {mostrarTema && (
-                                <>
-                                    <div
-                                        className="fixed inset-0 z-40"
-                                        onClick={() => setMostrarTema(false)}
-                                    />
-                                    <div className="absolute top-full right-0 mt-2 w-52 bg-dark-800 border border-white/10 rounded-2xl shadow-2xl z-50">
-                                        <SeletorTema aoFechar={() => setMostrarTema(false)} />
-                                    </div>
-                                </>
-                            )}
-                        </div>
                         <AvatarUsuario
                             genero={usuario.genero as "masculino" | "feminino" | "outro"}
                             tamanho={38}
                         />
+
+                        <span className="text-xs text-muted-foreground capitalize">
+                            {nomeMes(mes, ano)}
+                        </span>
+
                     </div>
                     <button
                         onClick={() => setSidebarAberta(false)}

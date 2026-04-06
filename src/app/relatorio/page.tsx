@@ -166,14 +166,13 @@ export default function RelatorioPage() {
     const totalGeral = dados.reduce((s, d) => s + d.pago, 0);
 
     return (
-        <main
-            className="max-w-2xl mx-auto px-4 md:px-8 pt-6 pb-28 md:pb-10"
-            aria-label="Página de relatórios financeiros"
-        >
+        <main className="max-w-2xl mx-auto px-4 md:px-8 pt-6 pb-28 md:pb-10 animate-fade-in"
+            aria-label="Página de relatórios financeiros">
             <div className="space-y-5">
 
                 {/* Header */}
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between animate-slide-up"
+                    style={{ animationFillMode: "both" }}>
                     <div>
                         <h1 className="text-xl font-semibold">Relatório</h1>
                         <p className="text-xs text-muted-foreground mt-0.5">Últimos 6 meses</p>
@@ -210,14 +209,17 @@ export default function RelatorioPage() {
                 </div>
 
                 {loading ? (
-                    <div className="text-center py-10 text-muted-foreground text-sm" role="status" aria-live="polite">
+                    <div className="text-center py-10 text-muted-foreground text-sm"
+                        role="status" aria-live="polite">
                         <span className="sr-only">Carregando dados do relatório...</span>
                         Carregando dados...
                     </div>
                 ) : (
                     <>
                         {/* Cards resumo */}
-                        <section aria-label="Resumo do mês atual" className="grid grid-cols-2 gap-3">
+                        <section aria-label="Resumo do mês atual"
+                            className="grid grid-cols-2 gap-3 animate-slide-up"
+                            style={{ animationDelay: "80ms", animationFillMode: "both" }}>
                             <div className="glass-card rounded-xl p-4">
                                 <p className="text-xs text-muted-foreground mb-1">Pago no mês atual</p>
                                 <p className="text-lg font-semibold text-brand-400">
@@ -233,13 +235,17 @@ export default function RelatorioPage() {
                         </section>
 
                         {/* Gráfico */}
-                        <section aria-label="Gráfico de gastos por mês" className="glass-card rounded-2xl p-4">
+                        <section aria-label="Gráfico de gastos por mês"
+                            className="glass-card rounded-2xl p-4 animate-slide-up"
+                            style={{ animationDelay: "160ms", animationFillMode: "both" }}>
                             <p className="text-sm font-medium mb-4">Gastos por mês</p>
                             <GraficoBarras dados={dados} />
                         </section>
 
                         {/* Detalhamento */}
-                        <section aria-label="Detalhamento mensal" className="glass-card rounded-2xl p-4">
+                        <section aria-label="Detalhamento mensal"
+                            className="glass-card rounded-2xl p-4 animate-slide-up"
+                            style={{ animationDelay: "240ms", animationFillMode: "both" }}>
                             <p className="text-sm font-medium mb-3">Detalhamento</p>
                             <ul className="space-y-2 list-none" aria-label="Progresso de pagamento por mês">
                                 {dados.map((d) => (
