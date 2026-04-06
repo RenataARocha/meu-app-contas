@@ -14,32 +14,57 @@ const TemaContexto = createContext<TemaContexto>({
     setTema: () => { },
 });
 
-export function TemaProvider({ children }: { children: React.ReactNode }) {
-    const [tema, setTemaState] = useState<Tema>("navy");
+// Script inline — roda antes do React para evitar flash de tema errado
+export const temaScript = `
+  (function() {
+    try {
+      var tema = localStorage.getItem("tema") || "navy";
+      if (!["navy","midnight","roxo"].includes(tema)) tema = "navy";
 
-    useEffect(() => {
-        const salvo = localStorage.getItem("tema") as Tema | null;
-        if (salvo && ["navy", "midnight", "roxo"].includes(salvo)) {
-            setTemaState(salvo);
+      document.documentElement.setAttribute("data-tema", tema);
+
+      var cores = {
+        navy: "#060d18",
+        midnight: "#030a08",
+        roxo: "#0d0a14"
+      };
+
+      document.documentElement.style.backgroundColor = cores[tema];
+    } catch(e) {}
+  })();
+`;
+
+export function TemaProvider({ children }: { children: React.ReactNode }) {
+    const [tema, setTemaState] = useState<Tema>(() => {
+        if (typeof window !== "undefined") {
+            const salvo = localStorage.getItem("tema") as Tema;
+            if (salvo && ["navy", "midnight", "roxo"].includes(salvo)) {
+                return salvo;
+            }
         }
-    }, []);
+        return "navy";
+    });
+
 
     useEffect(() => {
         document.documentElement.setAttribute("data-tema", tema);
-        document.body.setAttribute("data-tema", tema);
 
         const cores: Record<Tema, string> = {
-            navy: "hsl(220, 40%, 6%)",
-            midnight: "hsl(150, 40%, 3%)",
-            roxo: "hsl(270, 25%, 5%)",
+            navy: "#060d18",
+            midnight: "#030a08",
+            roxo: "#0d0a14",
         };
 
-        document.body.style.backgroundColor = cores[tema];
-        document.body.style.transition = "background-color 0.4s ease";
+        // 🔥 AGORA CORRETO — usa só HTML (não usa body)
+        document.documentElement.style.backgroundColor = cores[tema];
+        document.documentElement.style.transition = "background-color 0.4s ease";
+
         localStorage.setItem("tema", tema);
     }, [tema]);
 
-    function setTema(t: Tema) { setTemaState(t); }
+    function setTema(t: Tema) {
+        setTemaState(t);
+    }
 
     return (
         <TemaContexto.Provider value={{ tema, setTema }}>

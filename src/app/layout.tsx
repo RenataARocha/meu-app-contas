@@ -2,9 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { NavBar } from "@/components/NavBar";
-import { TemaProvider } from "@/lib/tema";
+import { TemaProvider, temaScript } from "@/lib/tema";
 import { PwaRegistro } from "@/components/PwaRegistro";
-import { LoadingScreen } from "@/components/LoadingScreen";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -29,9 +28,6 @@ export const metadata: Metadata = {
     icon: "/favicon.ico",
     apple: "/apple-touch-icon.png",
   },
-  other: {
-    "mobile-web-app-capable": "yes",
-  },
 };
 
 export default function RootLayout({
@@ -40,7 +36,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR" className={`dark ${inter.variable}`} data-tema="navy">
+    <html
+      lang="pt-BR"
+      className={inter.variable}
+      suppressHydrationWarning
+    >
+      <head>
+        {/* Script roda antes do React — evita flash de tema errado */}
+        <script dangerouslySetInnerHTML={{ __html: temaScript }} />
+      </head>
       <body className="antialiased bg-background min-h-screen">
         <TemaProvider>
           <PwaRegistro />
