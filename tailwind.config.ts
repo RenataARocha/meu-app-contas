@@ -47,11 +47,11 @@ const config: Config = {
         /* ── Paleta Navy ── */
         dark: {
           950: "#020409",
-          900: "#060d18",   // fundo mais escuro
-          800: "#0a1628",   // fundo cards
-          700: "#0f2040",   // inputs
-          600: "#152a52",   // bordas/separadores
-          500: "#1e3a6e",   // hover states
+          900: "#060d18", // fundo mais escuro
+          800: "#0a1628", // fundo cards
+          700: "#0f2040", // inputs
+          600: "#152a52", // bordas/separadores
+          500: "#1e3a6e", // hover states
         },
 
         /* ── Verde brand (mantido) ── */
@@ -95,11 +95,6 @@ const config: Config = {
         "glow-red": "0 0 20px rgba(239, 68, 68, 0.15)",
         "navy-card": "0 4px 24px rgba(0, 0, 0, 0.4)",
       },
-      animation: {
-        "fade-in": "fadeIn 0.3s ease-out",
-        "slide-up": "slideUp 0.3s ease-out",
-        "slide-right": "slideRight 0.3s ease-out",
-      },
       keyframes: {
         fadeIn: {
           "0%": { opacity: "0" },
@@ -113,6 +108,22 @@ const config: Config = {
           "0%": { opacity: "0", transform: "translateX(-12px)" },
           "100%": { opacity: "1", transform: "translateX(0)" },
         },
+        bounceSlow: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        loadingBar: {
+          "0%": { width: "0%", marginLeft: "0%" },
+          "50%": { width: "60%", marginLeft: "20%" },
+          "100%": { width: "0%", marginLeft: "100%" },
+        },
+      },
+      animation: {
+        "fade-in": "fadeIn 0.4s ease-out",
+        "slide-up": "slideUp 0.4s ease-out",
+        "slide-right": "slideRight 0.3s ease-out",
+        "bounce-slow": "bounceSlow 1.5s ease-in-out infinite",
+        "loading-bar": "loadingBar 1.2s ease-in-out infinite",
       },
     },
   },

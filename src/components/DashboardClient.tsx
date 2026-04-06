@@ -16,6 +16,7 @@ import { useTema } from "@/lib/tema";
 import { Moon, Sun } from "lucide-react";
 import { SeletorTema } from "./SeletorTema";
 import { Palette } from "lucide-react";
+import { LoadingScreen } from "./LoadingScreen";
 
 interface Props {
     usuarioInicial: Usuario | null;
@@ -43,8 +44,13 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
     const [modalPagamento, setModalPagamento] = useState<string | null>(null);
     const [sidebarAberta, setSidebarAberta] = useState(false);
     const [mostrarTema, setMostrarTema] = useState(false);
+    const [loadingTerminou, setLoadingTerminou] = useState(false);
+
 
     if (!usuario) return <PrimeiroAcesso onCriado={setUsuario} />;
+
+    // Renderiza loading + conteúdo ao mesmo tempo
+    // O conteúdo fica "escondido" pelas animações até o loading sumir
 
     const contasFiltradas = contas.filter((c) => {
         const buscaNome = c.nome.toLowerCase().includes(busca.toLowerCase());
@@ -95,6 +101,9 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
 
     return (
         <div className="min-h-screen bg-dark-900">
+
+            {/* Loading screen — some depois de 2.2s */}
+            <LoadingScreen onTerminou={() => setLoadingTerminou(true)} />
 
             {/* ── OVERLAY SIDEBAR ── */}
             {sidebarAberta && (
@@ -184,7 +193,7 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
 
             {/* ── HEADER DESKTOP ── */}
             <header
-                className="hidden md:flex items-center justify-between px-8 py-4 border-b border-white/5 bg-dark-800/80 backdrop-blur-sm sticky top-0 z-30"
+                className={`hidden md:flex items-center justify-between px-8 py-4 border-b border-white/5 bg-dark-800/80 backdrop-blur-sm sticky top-0 z-30 ${loadingTerminou ? "animate-fade-in" : "opacity-0"}`}
                 role="banner"
             >
                 <div className="flex items-center gap-4">
@@ -270,7 +279,9 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                 </a>
 
                 {/* Header mobile */}
-                <div className="flex items-center justify-between mb-5 md:hidden">
+                <div className={`flex items-center justify-between mb-5 md:hidden
+                       ${loadingTerminou ? "animate-fade-in" : "opacity-0"}`}>
+
                     <div>
                         <p className="text-xs text-muted-foreground">{saudacao},</p>
                         <h1 className="text-xl font-semibold capitalize">
@@ -298,12 +309,18 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                 </div>
 
                 {/* Resumo financeiro */}
-                <section aria-label="Resumo financeiro do mês" className="mb-5">
+                <section className={`mb-5 ${loadingTerminou ? "animate-slide-up" : "opacity-0"}`}
+                    style={{ animationDelay: loadingTerminou ? "100ms" : "0ms", animationFillMode: "both" }}
+                >
                     <Resumo total={total} pago={pago} pendente={total - pago} />
                 </section>
 
                 {/* Filtros + botão */}
-                <section aria-label="Filtros e ações" className="flex flex-col md:flex-row gap-3 mb-5">
+                <section
+                    className={`flex flex-col md:flex-row gap-3 mb-5
+                    ${loadingTerminou ? "animate-slide-up" : "opacity-0"}`}
+                    style={{ animationDelay: loadingTerminou ? "200ms" : "0ms", animationFillMode: "both" }}
+                >
 
                     {/* Busca mobile */}
                     <div className="flex gap-2 md:hidden">
@@ -331,10 +348,10 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                         >
                             <SlidersHorizontal size={18} aria-hidden="true" />
                         </button>
-                    </div>
+                    </div >
 
                     {/* Filtros desktop */}
-                    <div className="hidden md:flex gap-3 flex-1" role="group" aria-label="Filtros de contas">
+                    < div className="hidden md:flex gap-3 flex-1" role="group" aria-label="Filtros de contas" >
                         <label htmlFor="filtro-banco" className="sr-only">Filtrar por banco</label>
                         <input
                             id="filtro-banco"
@@ -354,7 +371,7 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                             <option value="pendente">Pendente</option>
                             <option value="pago">Pago</option>
                         </select>
-                    </div>
+                    </div >
 
                     <button
                         onClick={() => { setContaEditando(null); setModalForm(true); }}
@@ -369,36 +386,38 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                         <Plus size={18} aria-hidden="true" />
                         Adicionar conta
                     </button>
-                </section>
+                </section >
 
                 {/* Filtros mobile expansíveis */}
-                {mostrarFiltros && (
-                    <div
-                        className="flex gap-2 mb-4 md:hidden"
-                        role="group"
-                        aria-label="Filtros adicionais"
-                    >
-                        <label htmlFor="filtro-banco-mobile" className="sr-only">Filtrar por banco</label>
-                        <input
-                            id="filtro-banco-mobile"
-                            value={filtroBanco}
-                            onChange={(e) => setFiltroBanco(e.target.value)}
-                            placeholder="Filtrar banco..."
-                            className={`flex-1 px-3 py-2 text-xs ${inputClass}`}
-                        />
-                        <label htmlFor="filtro-status-mobile" className="sr-only">Filtrar por status</label>
-                        <select
-                            id="filtro-status-mobile"
-                            value={filtroStatus}
-                            onChange={(e) => setFiltroStatus(e.target.value as "todos" | "pendente" | "pago")}
-                            className={`px-3 py-2 text-xs ${inputClass} text-foreground`}
+                {
+                    mostrarFiltros && (
+                        <div
+                            className="flex gap-2 mb-4 md:hidden"
+                            role="group"
+                            aria-label="Filtros adicionais"
                         >
-                            <option value="todos">Todos</option>
-                            <option value="pendente">Pendente</option>
-                            <option value="pago">Pago</option>
-                        </select>
-                    </div>
-                )}
+                            <label htmlFor="filtro-banco-mobile" className="sr-only">Filtrar por banco</label>
+                            <input
+                                id="filtro-banco-mobile"
+                                value={filtroBanco}
+                                onChange={(e) => setFiltroBanco(e.target.value)}
+                                placeholder="Filtrar banco..."
+                                className={`flex-1 px-3 py-2 text-xs ${inputClass}`}
+                            />
+                            <label htmlFor="filtro-status-mobile" className="sr-only">Filtrar por status</label>
+                            <select
+                                id="filtro-status-mobile"
+                                value={filtroStatus}
+                                onChange={(e) => setFiltroStatus(e.target.value as "todos" | "pendente" | "pago")}
+                                className={`px-3 py-2 text-xs ${inputClass} text-foreground`}
+                            >
+                                <option value="todos">Todos</option>
+                                <option value="pendente">Pendente</option>
+                                <option value="pago">Pago</option>
+                            </select>
+                        </div>
+                    )
+                }
 
                 {/* Lista de contas */}
                 <section
@@ -414,12 +433,16 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                                 <p className="text-sm">Nenhuma conta encontrada</p>
                             </div>
                         ) : (
-                            <ul
-                                className="grid grid-cols-1 md:grid-cols-2 gap-3 pb-4 list-none"
-                                aria-label="Contas do mês"
-                            >
-                                {contasFiltradas.map((conta) => (
-                                    <li key={conta.id}>
+                            <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 pb-4 list-none">
+                                {contasFiltradas.map((conta, index) => (
+                                    <li
+                                        key={conta.id}
+                                        className={loadingTerminou ? "animate-slide-up" : "opacity-0"}
+                                        style={{
+                                            animationDelay: loadingTerminou ? `${300 + index * 60}ms` : "0ms",
+                                            animationFillMode: "both",
+                                        }}
+                                    >
                                         <ContaCard
                                             conta={conta}
                                             onMarcarPago={handleMarcarPago}
@@ -432,7 +455,7 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                         )}
                     </div>
                 </section>
-            </main>
+            </main >
 
             {/* Modais */}
             {

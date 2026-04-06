@@ -4,7 +4,7 @@ import "./globals.css";
 import { NavBar } from "@/components/NavBar";
 import { TemaProvider } from "@/lib/tema";
 import { PwaRegistro } from "@/components/PwaRegistro";
-
+import { LoadingScreen } from "@/components/LoadingScreen";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 

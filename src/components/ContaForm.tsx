@@ -78,22 +78,16 @@ export function ContaForm({ conta, usuarioId, mes, ano, onFechar, onSalvo }: Pro
             role="dialog"
             aria-modal="true"
             aria-labelledby="form-titulo"
-            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+            className="fixed inset-0 z-50 flex items-end justify-center animate-fade-in"
             style={{ backgroundColor: "rgba(0,0,0,0.7)" }}
             onClick={(e) => e.target === e.currentTarget && onFechar()}
         >
             <div
-                className="
-    w-full 
-    sm:max-w-lg 
-    bg-dark-800 
-    rounded-t-3xl sm:rounded-2xl 
-    flex flex-col
-  "
-                style={{
-                    maxHeight: "90dvh",
-                }}
+                className="w-full max-w-md bg-dark-800 rounded-t-3xl border-t border-white/10
+             flex flex-col animate-slide-up"
+                style={{ maxHeight: "80dvh", paddingBottom: "80px" }}
             >
+
                 {/* Header fixo */}
                 <div className="flex items-center justify-between px-6 pt-6 pb-4 shrink-0">
                     <h2 id="form-titulo" className="text-base font-semibold">
