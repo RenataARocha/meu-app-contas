@@ -35,12 +35,21 @@ export default function HistoricoPage() {
         else setMes(mes - 1);
     }
 
+
+    const mesAtual = hoje.getMonth() + 1;
+    const anoAtual = hoje.getFullYear();
+    const proximoMes = mes === 12 ? 1 : mes + 1;
+    const proximoAno = mes === 12 ? ano + 1 : ano;
+    const limiteUltrapassado =
+        proximoAno > anoAtual + 1 ||
+        (proximoAno === anoAtual + 1 && proximoMes > mesAtual) ||
+        (proximoAno === anoAtual && proximoMes > mesAtual + 1);
+
+
     function mesSeguinte() {
-        const mesAtual = hoje.getMonth() + 1;
-        const anoAtual = hoje.getFullYear();
-        if (ano > anoAtual || (ano === anoAtual && mes >= mesAtual)) return;
-        if (mes === 12) { setMes(1); setAno(ano + 1); }
-        else setMes(mes + 1);
+        if (limiteUltrapassado) return;
+        setMes(proximoMes);
+        setAno(proximoAno);
     }
 
     const total = contas.reduce((s, c) => s + c.valor, 0);
@@ -86,7 +95,7 @@ export default function HistoricoPage() {
                     <span className="text-sm font-medium capitalize" aria-live="polite" aria-atomic="true">
                         {mesLabel}
                     </span>
-                    <button onClick={mesSeguinte} disabled={ehMesAtual} aria-label="Próximo mês"
+                    <button onClick={mesSeguinte} disabled={limiteUltrapassado} aria-label="Próximo mês"
                         aria-disabled={ehMesAtual}
                         className="p-1.5 rounded-lg hover:bg-white/5 text-muted-foreground
                      hover:text-foreground transition-colors disabled:opacity-30

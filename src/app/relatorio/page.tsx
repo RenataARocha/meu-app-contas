@@ -145,7 +145,7 @@ export default function RelatorioPage() {
                 margin: { left: 14, right: 14 },
             });
 
-            const pageCount = doc.getNumberOfPages();
+            const pageCount = (doc as any).getNumberOfPages();
             for (let i = 1; i <= pageCount; i++) {
                 doc.setPage(i);
                 doc.setFontSize(7);

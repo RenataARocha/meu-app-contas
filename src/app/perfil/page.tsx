@@ -6,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { usuarioSchema, type UsuarioFormData } from "@/schemas/usuarioSchema";
 import { AvatarUsuario } from "@/components/AvatarUsuario";
 import type { Usuario } from "@/types/usuario";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 export default function PerfilPage() {
     const [usuario, setUsuario] = useState<Usuario | null>(null);
@@ -50,13 +52,24 @@ export default function PerfilPage() {
         <main className="max-w-md mx-auto px-4 md:px-8 pt-6 pb-28 md:pb-10"
             aria-label="Configurações de perfil">
             <div className="space-y-6">
-
-                <div className="animate-slide-up" style={{ animationFillMode: "both" }}>
-                    <h1 className="text-xl font-semibold">Perfil</h1>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                        Personalize sua experiência
-                    </p>
+                <div className="flex items-start justify-between animate-slide-up"
+                    style={{ animationFillMode: "both" }}>
+                    <div>
+                        <h1 className="text-xl font-semibold">Perfil</h1>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                            Personalize sua experiência
+                        </p>
+                    </div>
+                    <Link href="/" aria-label="Voltar para o início"
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl
+               bg-brand-500/10 text-brand-400 hover:bg-brand-500/20
+               transition-all text-xs font-medium focus-visible:outline-none
+               focus-visible:ring-2 focus-visible:ring-brand-500">
+                        <ArrowLeft size={14} aria-hidden="true" />
+                        Início
+                    </Link>
                 </div>
+
 
                 {/* Avatar */}
                 <section aria-label="Prévia do avatar"

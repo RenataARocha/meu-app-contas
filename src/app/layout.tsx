@@ -4,6 +4,8 @@ import "./globals.css";
 import { NavBar } from "@/components/NavBar";
 import { TemaProvider, temaScript } from "@/lib/tema";
 import { PwaRegistro } from "@/components/PwaRegistro";
+import { SessionProviderWrapper } from "@/components/SessionProviderWrapper";
+
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -46,13 +48,15 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: temaScript }} />
       </head>
       <body className="antialiased bg-background min-h-screen">
-        <TemaProvider>
-          <PwaRegistro />
-          {children}
-          <div className="md:hidden">
-            <NavBar />
-          </div>
-        </TemaProvider>
+        <SessionProviderWrapper>
+          <TemaProvider>
+            <PwaRegistro />
+            {children}
+            <div className="md:hidden">
+              <NavBar />
+            </div>
+          </TemaProvider>
+        </SessionProviderWrapper>
       </body>
     </html>
   );
