@@ -1,16 +1,14 @@
-const CACHE = "minhascontas-v1";
+// const CACHE = "minhascontas-v2";
+const DEV = self.location.hostname === "localhost";
 
 const ARQUIVOS = [
-    "/",
-    "/historico",
-    "/relatorio",
-    "/perfil",
     "/manifest.json",
     "/icons/icon-192x192.png",
     "/icons/icon-512x512.png",
 ];
 
 self.addEventListener("install", (e) => {
+    if (DEV) { self.skipWaiting(); return; }
     e.waitUntil(
         caches.open(CACHE).then((c) => c.addAll(ARQUIVOS))
     );
@@ -20,15 +18,19 @@ self.addEventListener("install", (e) => {
 self.addEventListener("activate", (e) => {
     e.waitUntil(
         caches.keys().then((keys) =>
-            Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
+            Promise.all(keys.map((k) => caches.delete(k)))
         )
     );
     self.clients.claim();
 });
 
 self.addEventListener("fetch", (e) => {
+    // Em desenvolvimento nunca usa cache
+    if (DEV) return;
     if (e.request.method !== "GET") return;
     if (e.request.url.includes("/api/")) return;
+    if (e.request.url.includes("/_next/")) return;
+    if (e.request.url.includes("/login")) return;
 
     e.respondWith(
         caches.match(e.request).then((cached) => {
@@ -59,7 +61,5 @@ self.addEventListener("push", (e) => {
 
 self.addEventListener("notificationclick", (e) => {
     e.notification.close();
-    e.waitUntil(
-        clients.openWindow(e.notification.data.url)
-    );
-});
+    e.waitUntil(clients.openWindow(e.notification.data.url));
+}); 
