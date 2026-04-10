@@ -41,16 +41,17 @@ model VerificationToken {
 }
 
 model Usuario {
-  id            String    @id @default(cuid())
-  nome          String    @default("")
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  genero        String    @default("outro")
-  createdAt     DateTime  @default(now())
-  contas        Conta[]
-  accounts      Account[]
-  sessions      Session[]
+  id                String             @id @default(cuid())
+  nome              String             @default("")
+  email             String?            @unique
+  emailVerified     DateTime?
+  image             String?
+  genero            String             @default("outro")
+  createdAt         DateTime           @default(now())
+  contas            Conta[]
+  accounts          Account[]
+  sessions          Session[]
+  pushSubscriptions PushSubscription[]
 }
 
 model Conta {
@@ -67,4 +68,13 @@ model Conta {
   createdAt     DateTime  @default(now())
   usuarioId     String
   usuario       Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+}
+
+model PushSubscription {
+  id       String  @id @default(cuid())
+  userId   String
+  endpoint String  @unique
+  p256dh   String
+  auth     String
+  user     Usuario @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
