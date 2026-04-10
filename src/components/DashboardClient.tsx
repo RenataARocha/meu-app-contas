@@ -186,7 +186,9 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                         <Menu size={20} aria-hidden="true" />
                     </button>
                     <div>
-                        <p className="text-xs text-muted-foreground">{saudacao},</p>
+                        <p className="text-xs text-muted-foreground" suppressHydrationWarning>
+                            {saudacao},
+                        </p>
                         <p className="text-lg font-semibold capitalize">
                             {usuario.nome.split(" ")[0]} 👋
                         </p>
@@ -262,7 +264,9 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                        ${loadingTerminou ? "animate-fade-in" : "opacity-0"}`}>
 
                     <div>
-                        <p className="text-xs text-muted-foreground">{saudacao},</p>
+                        <p className="text-xs text-muted-foreground" suppressHydrationWarning>
+                            {saudacao},
+                        </p>
                         <h1 className="text-xl font-semibold capitalize">
                             {usuario.nome.split(" ")[0]} 👋
                         </h1>
