@@ -125,16 +125,18 @@ export const authOptions: NextAuthOptions = {
 
   cookies: {
     sessionToken: {
-      name: `next-auth.session-token`,
+      name:
+        process.env.NODE_ENV === "production"
+          ? `__Secure-next-auth.session-token`
+          : `next-auth.session-token`,
       options: {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
-        secure: false, // ← força false em dev
+        secure: process.env.NODE_ENV === "production",
       },
     },
   },
-
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -144,13 +146,16 @@ export const authOptions: NextAuthOptions = {
   ],
 
   callbacks: {
+    async jwt({ token, user }) {
+      if (user) token.sub = user.id;
+      return token;
+    },
     async redirect({ url, baseUrl }) {
       if (url.startsWith("/")) return `${baseUrl}${url}`;
       if (url.startsWith(baseUrl)) return url;
       return baseUrl;
     },
     async session({ session, token }) {
-      // ← token, não user
       if (session.user && token.sub) {
         session.user.id = token.sub;
         const usuario = await prisma.usuario.findUnique({
