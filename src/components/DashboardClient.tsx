@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Search, SlidersHorizontal, Menu, X, Home, History, BarChart2, User } from "lucide-react";
 import Link from "next/link";
 import { AvatarUsuario } from "./AvatarUsuario";
@@ -66,6 +66,14 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
     const pago = contas.filter((c) => c.pago).reduce((s, c) => s + c.valor, 0);
     const hora = new Date().getHours();
     const saudacao = hora < 12 ? "Bom dia" : hora < 18 ? "Boa tarde" : "Boa noite";
+
+
+    useEffect(() => {
+        const handleFocus = () => recarregarContas();
+        window.addEventListener("focus", handleFocus);
+        return () => window.removeEventListener("focus", handleFocus);
+    }, []);
+
 
     async function recarregarContas() {
         const res = await fetch(`/api/contas?mes=${mes}&ano=${ano}&usuarioId=${usuario!.id}`);

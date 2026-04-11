@@ -3,8 +3,8 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { DashboardClient } from "@/components/DashboardClient";
-import type { Usuario } from "@/types/usuario";
-import type { Conta } from "@/types/conta";
+
+export const revalidate = 0;
 
 
 export default async function HomePage() {

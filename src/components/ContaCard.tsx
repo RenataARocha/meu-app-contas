@@ -20,13 +20,12 @@ export function ContaCard({ conta, onMarcarPago, onExcluir, onEditar, somenteLei
     const [montado, setMontado] = useState(false);
     const [expandido, setExpandido] = useState(false);
 
-    // Calcula o status só no cliente para evitar hydration mismatch
     useEffect(() => {
-        const s = statusVencimento(conta.diaVencimento);
+        const s = statusVencimento(conta.diaVencimento, conta.mes, conta.ano); // ← com mês/ano
         setStatusTexto(s.texto);
         setStatusUrgencia(s.urgencia);
         setMontado(true);
-    }, [conta.diaVencimento]);
+    }, [conta.diaVencimento, conta.mes, conta.ano]);
 
     const corUrgencia = {
         ok: "text-muted-foreground",
