@@ -59,7 +59,7 @@ export function CalendarioModal({ contas, mes, ano, onFechar }: Props) {
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-end md:items-center justify-center"
+            className="fixed inset-0 z-50 flex items-center justify-center px-4"
             role="dialog"
             aria-modal="true"
             aria-label="Calendário de contas"
@@ -69,89 +69,78 @@ export function CalendarioModal({ contas, mes, ano, onFechar }: Props) {
                 className="absolute inset-0 bg-black/60 backdrop-blur-sm"
                 onClick={onFechar}
             />
-
             {/* Modal */}
-            <div className="relative w-full max-w-sm bg-dark-800 border border-white/10 rounded-t-3xl md:rounded-3xl shadow-2xl z-10 p-5 animate-slide-up">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-4">
+            <div
+                className="relative w-full max-w-sm bg-dark-800 border border-white/10 rounded-2xl shadow-2xl z-10 flex flex-col animate-slide-up"
+                style={{ maxHeight: "min(85vh, 600px)" }}
+            >
+
+                {/* Header fixo */}
+                <div className="flex items-center justify-between p-5 pb-3 shrink-0">
                     <h2 className="text-base font-semibold capitalize">
                         Calendário — {new Date(ano, mes - 1).toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}
                     </h2>
-                    <button
-                        onClick={onFechar}
-                        aria-label="Fechar calendário"
-                        className="p-1.5 rounded-lg hover:bg-white/5 text-muted-foreground hover:text-foreground transition-colors"
-                    >
+                    <button onClick={onFechar} aria-label="Fechar calendário"
+                        className="p-1.5 rounded-lg hover:bg-white/5 text-muted-foreground hover:text-foreground transition-colors">
                         <X size={18} />
                     </button>
                 </div>
 
-                {/* Legenda */}
-                <div className="flex flex-wrap gap-3 mb-4 text-xs text-muted-foreground">
-                    {[
-                        { cor: "bg-brand-500", label: "Pago" },
-                        { cor: "bg-orange-400", label: "Próximo" },
-                        { cor: "bg-destructive", label: "Atrasado" },
-                        { cor: "bg-muted-foreground", label: "Pendente" },
-                    ].map(({ cor, label }) => (
-                        <span key={label} className="flex items-center gap-1">
-                            <span className={`w-2 h-2 rounded-full ${cor}`} />
-                            {label}
-                        </span>
-                    ))}
-                </div>
+                {/* Conteúdo com scroll */}
+                <div className="overflow-y-auto px-5 pb-5 flex-1">
+                    {/* Legenda */}
+                    <div className="flex flex-wrap gap-3 mb-4 text-xs text-muted-foreground">
+                        {[
+                            { cor: "bg-brand-500", label: "Pago" },
+                            { cor: "bg-orange-400", label: "Próximo" },
+                            { cor: "bg-destructive", label: "Atrasado" },
+                            { cor: "bg-muted-foreground", label: "Pendente" },
+                        ].map(({ cor, label }) => (
+                            <span key={label} className="flex items-center gap-1">
+                                <span className={`w-2 h-2 rounded-full ${cor}`} />
+                                {label}
+                            </span>
+                        ))}
+                    </div>
 
-                {/* Dias da semana */}
-                <div className="grid grid-cols-7 mb-1">
-                    {["D", "S", "T", "Q", "Q", "S", "S"].map((d, i) => (
-                        <div key={i} className="text-center text-xs text-muted-foreground py-1">
-                            {d}
-                        </div>
-                    ))}
-                </div>
+                    {/* Dias da semana */}
+                    <div className="grid grid-cols-7 mb-1">
+                        {["D", "S", "T", "Q", "Q", "S", "S"].map((d, i) => (
+                            <div key={i} className="text-center text-xs text-muted-foreground py-1">{d}</div>
+                        ))}
+                    </div>
 
-                {/* Grid de dias */}
-                <div className="grid grid-cols-7 gap-0.5">
-                    {/* Espaços vazios antes do primeiro dia */}
-                    {Array.from({ length: primeiroDia }).map((_, i) => (
-                        <div key={`empty-${i}`} />
-                    ))}
+                    {/* Grid de dias */}
+                    <div className="grid grid-cols-7 gap-0.5">
+                        {Array.from({ length: primeiroDia }).map((_, i) => <div key={`empty-${i}`} />)}
+                        {Array.from({ length: diasNoMes }).map((_, i) => {
+                            const dia = i + 1;
+                            const status = statusDia(dia);
+                            const cs = contasPorDia(dia);
+                            const selecionado = diaSelecionado === dia;
+                            return (
+                                <button key={dia}
+                                    onClick={() => setDiaSelecionado(selecionado ? null : dia)}
+                                    className={cn(
+                                        "relative flex flex-col items-center justify-center rounded-xl py-1.5 text-xs font-medium transition-all",
+                                        status ? corDia[status] : "text-muted-foreground hover:bg-white/5",
+                                        selecionado && "ring-2 ring-brand-500"
+                                    )}>
+                                    {dia}
+                                    {cs.length > 0 && (
+                                        <span className={cn("w-1.5 h-1.5 rounded-full mt-0.5", corPonto[status!])} />
+                                    )}
+                                </button>
+                            );
+                        })}
+                    </div>
 
-                    {/* Dias do mês */}
-                    {Array.from({ length: diasNoMes }).map((_, i) => {
-                        const dia = i + 1;
-                        const status = statusDia(dia);
-                        const cs = contasPorDia(dia);
-                        const selecionado = diaSelecionado === dia;
-
-                        return (
-                            <button
-                                key={dia}
-                                onClick={() => setDiaSelecionado(selecionado ? null : dia)}
-                                className={cn(
-                                    "relative flex flex-col items-center justify-center rounded-xl py-1.5 text-xs font-medium transition-all",
-                                    status ? corDia[status] : "text-muted-foreground hover:bg-white/5",
-                                    selecionado && "ring-2 ring-brand-500"
-                                )}
-                            >
-                                {dia}
-                                {cs.length > 0 && (
-                                    <span className={cn("w-1.5 h-1.5 rounded-full mt-0.5", corPonto[status!])} />
-                                )}
-                            </button>
-                        );
-                    })}
-                </div>
-
-                {/* Contas do dia selecionado */}
-                {diaSelecionado && (
-                    <div className="mt-4 border-t border-white/5 pt-4 space-y-2">
-                        <p className="text-xs text-muted-foreground font-medium">
-                            Dia {diaSelecionado} — {contasDiaSelecionado.length} conta{contasDiaSelecionado.length !== 1 ? "s" : ""}
-                        </p>
-                        {contasDiaSelecionado.length === 0 ? (
-                            <p className="text-xs text-muted-foreground">Nenhuma conta neste dia</p>
-                        ) : (
+                    {/* Contas do dia selecionado */}
+                    {diaSelecionado && (
+                        <div className="mt-4 border-t border-white/5 pt-4 space-y-2">
+                            <p className="text-xs text-muted-foreground font-medium">
+                                Dia {diaSelecionado} — {contasDiaSelecionado.length} conta{contasDiaSelecionado.length !== 1 ? "s" : ""}
+                            </p>
                             <ul className="space-y-2">
                                 {contasDiaSelecionado.map((c) => (
                                     <li key={c.id} className="flex items-center justify-between bg-dark-700 rounded-xl px-3 py-2">
@@ -172,9 +161,9 @@ export function CalendarioModal({ contas, mes, ano, onFechar }: Props) {
                                     </li>
                                 ))}
                             </ul>
-                        )}
-                    </div>
-                )}
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

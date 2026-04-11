@@ -90,14 +90,15 @@ export function ContaForm({ conta, usuarioId, mes, ano, onFechar, onSalvo }: Pro
             role="dialog"
             aria-modal="true"
             aria-labelledby="form-titulo"
-            className="fixed inset-0 z-50 flex items-end justify-center animate-fade-in"
+            className="fixed inset-0 z-50 flex items-center justify-center px-4 animate-fade-in"
             style={{ backgroundColor: "rgba(0,0,0,0.7)" }}
             onClick={(e) => e.target === e.currentTarget && onFechar()}
         >
             <div
-                className="w-full max-w-md bg-dark-800 rounded-t-3xl border-t border-white/10 flex flex-col"
+                className="w-full max-w-md bg-dark-800 border border-white/10 rounded-2xl flex flex-col animate-slide-up"
                 style={{ maxHeight: "85dvh" }}
             >
+
                 {/* Header fixo */}
                 <div className="flex items-center justify-between px-6 pt-6 pb-4 shrink-0">
                     <h2 id="form-titulo" className="text-base font-semibold">
@@ -152,7 +153,7 @@ export function ContaForm({ conta, usuarioId, mes, ano, onFechar, onSalvo }: Pro
                         </div>
 
                         {/* Botões */}
-                        <div className="flex gap-3 pt-2 pb-20">
+                        <div className="flex gap-3 pt-2 pb-5">
                             <button
                                 type="button"
                                 onClick={onFechar}

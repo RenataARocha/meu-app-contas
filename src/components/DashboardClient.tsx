@@ -90,7 +90,8 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 pago: novoPago,
-                dataPagamento: novoPago && data ? new Date(data).toISOString() : null,
+                // ← Adiciona T12:00:00 para evitar problema de fuso
+                dataPagamento: novoPago && data ? `${data}T12:00:00.000Z` : null,
             }),
         });
         await recarregarContas();
