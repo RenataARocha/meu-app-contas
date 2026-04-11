@@ -96,6 +96,16 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
         else confirmarPagamento(id, false, null);
     }
 
+    function dataAtualFormatada() {
+        return new Date().toLocaleString("pt-BR", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+    }
+
     async function confirmarPagamento(id: string, novoPago: boolean, data: string | null) {
         await fetch(`/api/contas/${id}`, {
             method: "PATCH",
@@ -139,19 +149,12 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                     sidebarAberta ? "translate-x-0" : "-translate-x-full"
                 )}
             >
-                <div className="flex items-center justify-between p-5 border-b border-white/5">
-                    <div className="flex items-center gap-6 ml-3">
+                <div className="flex items-center justify-end p-5 gap-5 border-b border-white/5">
 
-                        <AvatarUsuario
-                            genero={usuario.genero as "masculino" | "feminino" | "outro"}
-                            tamanho={38}
-                        />
+                    <span className="text-xs text-muted-foreground capitalize">
+                        {dataAtualFormatada()}
+                    </span>
 
-                        <span className="text-xs text-muted-foreground capitalize">
-                            {nomeMes(mes, ano)}
-                        </span>
-
-                    </div>
                     <button
                         onClick={() => setSidebarAberta(false)}
                         aria-label="Fechar menu"
@@ -225,7 +228,7 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
 
                 <div className="flex items-center gap-3">
                     <span className="text-xs text-muted-foreground capitalize">
-                        {nomeMes(mes, ano)}
+                        {dataAtualFormatada()}
                     </span>
                     <div className="relative">
                         <button
@@ -262,10 +265,12 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                             </>
                         )}
                     </div>
-                    <AvatarUsuario
-                        genero={usuario.genero as "masculino" | "feminino" | "outro"}
-                        tamanho={38}
-                    />
+                    <Link href="/perfil">
+                        <AvatarUsuario
+                            genero={usuario.genero as "masculino" | "feminino" | "outro"}
+                            tamanho={38}
+                        />
+                    </Link>
                 </div>
             </header>
 
@@ -298,7 +303,7 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                             {usuario.nome.split(" ")[0]} 👋
                         </h1>
                         <p className="text-xs text-muted-foreground mt-0.5 capitalize">
-                            {nomeMes(mes, ano)}
+                            {dataAtualFormatada()}
                         </p>
                     </div>
 
@@ -322,10 +327,12 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                         >
                             <Menu size={20} aria-hidden="true" />
                         </button>
-                        <AvatarUsuario
-                            genero={usuario.genero as "masculino" | "feminino" | "outro"}
-                            tamanho={42}
-                        />
+                        <Link href="/perfil">
+                            <AvatarUsuario
+                                genero={usuario.genero as "masculino" | "feminino" | "outro"}
+                                tamanho={38}
+                            />
+                        </Link>
                     </div>
                 </div>
 
