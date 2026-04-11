@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 
   openGraph: {
     title: "MinhasConta$ — Controle suas contas mensais",
-    description: "Organize e acompanhe suas contas mensais de forma simples e visual.",
+    description: "Organize suas contas mensais de forma simples e visual. Acompanhe vencimentos, marque pagamentos e receba notificações antes do prazo.",
     url: "https://meu-app-contas.vercel.app",
     siteName: "MinhasConta$",
     images: [
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "MinhasConta$ — Controle suas contas mensais",
-    description: "Organize e acompanhe suas contas mensais de forma simples e visual.",
+    description: "Organize suas contas mensais de forma simples e visual. Acompanhe vencimentos, marque pagamentos e receba notificações antes do prazo.",
     images: ["https://meu-app-contas.vercel.app/og-image.png"],
   },
 
