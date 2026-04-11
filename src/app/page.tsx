@@ -11,6 +11,14 @@ export default async function HomePage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/login");
 
+  // Busca usuário no banco
+  const usuario = await prisma.usuario.findUnique({
+    where: { id: session.user.id },
+  });
+
+  // Se não existe no banco, faz logout e redireciona para login
+  if (!usuario) redirect("/api/auth/signout?callbackUrl=/login");
+
   const hoje = new Date();
   const mes = hoje.getMonth() + 1;
   const ano = hoje.getFullYear();
