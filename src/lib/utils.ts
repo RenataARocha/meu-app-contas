@@ -28,10 +28,12 @@ export function statusVencimento(dia: number): {
   urgencia: "ok" | "proximo" | "hoje" | "atrasado";
 } {
   const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0); // ← zera as horas
   const vencimento = new Date(hoje.getFullYear(), hoje.getMonth(), dia);
+  vencimento.setHours(0, 0, 0, 0); // ← zera as horas
   const diff = differenceInDays(vencimento, hoje);
-
-  if (diff < 0) return { texto: `Atrasado ${Math.abs(diff)}d`, urgencia: "atrasado" };
+  if (diff < 0)
+    return { texto: `Atrasado ${Math.abs(diff)}d`, urgencia: "atrasado" };
   if (diff === 0) return { texto: "Vence hoje!", urgencia: "hoje" };
   if (diff <= 5) return { texto: `Vence em ${diff}d`, urgencia: "proximo" };
   return { texto: `Dia ${dia}`, urgencia: "ok" };

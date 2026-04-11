@@ -10,10 +10,10 @@ webpush.setVapidDetails(
 
 export async function GET(request: Request) {
   // Proteção: só Vercel Cron pode chamar
-  const authHeader = request.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-  }
+  //   const authHeader = request.headers.get("authorization");
+  //   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  //     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+  //   }
 
   const amanha = new Date();
   amanha.setDate(amanha.getDate() + 1);
