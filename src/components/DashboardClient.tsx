@@ -12,11 +12,11 @@ import { PrimeiroAcesso } from "./PrimeiroAcesso";
 import { nomeMes, cn } from "@/lib/utils";
 import type { Conta } from "@/types/conta";
 import type { Usuario } from "@/types/usuario";
-import { useTema } from "@/lib/tema";
-import { Moon, Sun } from "lucide-react";
 import { SeletorTema } from "./SeletorTema";
 import { Palette } from "lucide-react";
 import { LoadingScreen } from "./LoadingScreen";
+import { CalendarioModal } from "./CalendarioModal";
+import { CalendarDays } from "lucide-react";
 
 interface Props {
     usuarioInicial: Usuario | null;
@@ -45,7 +45,7 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
     const [sidebarAberta, setSidebarAberta] = useState(false);
     const [mostrarTema, setMostrarTema] = useState(false);
     const [loadingTerminou, setLoadingTerminou] = useState(false);
-
+    const [mostrarCalendario, setMostrarCalendario] = useState(false);
 
     if (!usuario) return <PrimeiroAcesso onCriado={setUsuario} />;
 
@@ -163,6 +163,8 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                             {label}
                         </Link>
                     ))}
+
+
                 </nav>
 
                 <div className="p-4 border-t border-white/5">
@@ -224,6 +226,17 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                             <Palette size={18} aria-hidden="true" />
                         </button>
 
+                        <button
+                            onClick={() => setMostrarCalendario(true)}
+                            aria-label="Abrir calendário"
+                            className="p-2 rounded-xl hover:bg-white/5 text-muted-foreground
+             hover:text-foreground transition-all focus-visible:outline-none
+             focus-visible:ring-2 focus-visible:ring-brand-500"
+                        >
+                            <CalendarDays size={18} aria-hidden="true" />
+                        </button>
+
+
                         {mostrarTema && (
                             <>
                                 <div
@@ -261,8 +274,9 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
 
                 {/* Header mobile */}
                 <div className={`flex items-center justify-between mb-5 md:hidden
-                       ${loadingTerminou ? "animate-fade-in" : "opacity-0"}`}>
+       ${loadingTerminou ? "animate-fade-in" : "opacity-0"}`}>
 
+                    {/* Esquerda: saudação */}
                     <div>
                         <p className="text-xs text-muted-foreground" suppressHydrationWarning>
                             {saudacao},
@@ -274,13 +288,24 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                             {nomeMes(mes, ano)}
                         </p>
                     </div>
+
+                    {/* Direita: calendário + menu + avatar */}
                     <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => setMostrarCalendario(true)}
+                            aria-label="Abrir calendário"
+                            className="p-2 rounded-xl hover:bg-white/5 text-muted-foreground 
+                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                        >
+                            <CalendarDays size={20} aria-hidden="true" />
+                        </button>
                         <button
                             onClick={() => setSidebarAberta(true)}
                             aria-label="Abrir menu de navegação"
                             aria-expanded={sidebarAberta}
                             aria-controls="sidebar-menu"
-                            className="p-2 rounded-xl hover:bg-white/5 text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                            className="p-2 rounded-xl hover:bg-white/5 text-muted-foreground 
+                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
                         >
                             <Menu size={20} aria-hidden="true" />
                         </button>
@@ -461,6 +486,15 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                     />
                 )
             }
+
+            {mostrarCalendario && (
+                <CalendarioModal
+                    contas={contas}
+                    mes={mes}
+                    ano={ano}
+                    onFechar={() => setMostrarCalendario(false)}
+                />
+            )}
         </div >
     );
 }
