@@ -7,7 +7,7 @@ const prismaAdapter = {
     return prisma.usuario.create({
       data: {
         email: data.email,
-        nome: data.name || "",
+        nome: data.name?.split(" ")[0] || "",
         image: data.image || "",
         emailVerified: data.emailVerified,
       },
@@ -42,9 +42,9 @@ const prismaAdapter = {
       where: { id: data.id },
       data: {
         email: data.email,
-        nome: data.name || "",
         image: data.image || "",
         emailVerified: data.emailVerified,
+        // nome removido — não deixa Google sobrescrever
       },
     });
     return { ...user, name: user.nome, email: user.email ?? "" };
@@ -162,7 +162,7 @@ export const authOptions: NextAuthOptions = {
           where: { id: token.sub },
           select: { nome: true, genero: true },
         });
-        session.user.nome = usuario?.nome || session.user.name || "";
+        session.user.nome = usuario?.nome || ""; // ← remove o || session.user.name
         session.user.genero = usuario?.genero || "outro";
       }
       return session;
