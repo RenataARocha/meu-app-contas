@@ -18,16 +18,49 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "MinhasConta$",
-  description: "Controle suas contas mensais com estilo",
+  title: "MinhasConta$ — Controle suas contas mensais",
+  description: "Organize e acompanhe suas contas mensais de forma simples e visual. Vencimentos, pagamentos e recorrências em um só lugar.",
   manifest: "/manifest.json",
+  keywords: ["controle financeiro", "contas mensais", "finanças pessoais", "organizar contas", "vencimentos"],
+  authors: [{ name: "Renata Rocha" }],
+  creator: "Renata Rocha",
+
+  openGraph: {
+    title: "MinhasConta$ — Controle suas contas mensais",
+    description: "Organize e acompanhe suas contas mensais de forma simples e visual.",
+    url: "https://meu-app-contas.vercel.app",
+    siteName: "MinhasConta$",
+    images: [
+      {
+        url: "https://meu-app-contas.vercel.app/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "MinhasConta$ — Controle suas contas mensais",
+      },
+    ],
+    locale: "pt_BR",
+    type: "website",
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "MinhasConta$ — Controle suas contas mensais",
+    description: "Organize e acompanhe suas contas mensais de forma simples e visual.",
+    images: ["https://meu-app-contas.vercel.app/og-image.png"],
+  },
+
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
     title: "MinhasConta$",
   },
+
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
     apple: "/apple-touch-icon.png",
   },
 };
