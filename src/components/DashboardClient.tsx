@@ -47,6 +47,17 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
     const [loadingTerminou, setLoadingTerminou] = useState(false);
     const [mostrarCalendario, setMostrarCalendario] = useState(false);
 
+
+    useEffect(() => {
+        if (!usuario) return;
+
+        const handleFocus = () => recarregarContas();
+
+        window.addEventListener("focus", handleFocus);
+        return () => window.removeEventListener("focus", handleFocus);
+    }, [usuario]);
+
+
     if (!usuario) return <PrimeiroAcesso onCriado={setUsuario} />;
 
     // Renderiza loading + conteúdo ao mesmo tempo
@@ -66,13 +77,6 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
     const pago = contas.filter((c) => c.pago).reduce((s, c) => s + c.valor, 0);
     const hora = new Date().getHours();
     const saudacao = hora < 12 ? "Bom dia" : hora < 18 ? "Boa tarde" : "Boa noite";
-
-
-    useEffect(() => {
-        const handleFocus = () => recarregarContas();
-        window.addEventListener("focus", handleFocus);
-        return () => window.removeEventListener("focus", handleFocus);
-    }, []);
 
 
     async function recarregarContas() {
