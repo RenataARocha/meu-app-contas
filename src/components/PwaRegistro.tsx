@@ -12,6 +12,20 @@ export function PwaRegistro() {
         async function registrar() {
             try {
                 const reg = await navigator.serviceWorker.register("/sw.js");
+
+                reg.update();
+
+                reg.addEventListener("updatefound", () => {
+                    const installingWorker = reg.installing;
+                    if (!installingWorker) return;
+
+                    installingWorker.addEventListener("statechange", () => {
+                        if (installingWorker.state === "activated" && navigator.serviceWorker.controller) {
+                            window.location.reload();
+                        }
+                    });
+                });
+
                 console.log("SW registrado:", reg.scope);
 
                 const permissao = await Notification.requestPermission();

@@ -1,4 +1,4 @@
-const CACHE = "minhascontas-v2";
+const CACHE = "minhascontas-v3";
 const DEV = self.location.hostname === "localhost";
 
 const ARQUIVOS = [
