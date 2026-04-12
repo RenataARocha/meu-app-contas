@@ -137,24 +137,28 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                 />
             )}
 
-            {/* ── SIDEBAR ── */}
+
+            {/* ── SIDEBAR ── só desktop ── */}
             <aside
                 id="sidebar-menu"
                 role="navigation"
                 aria-label="Menu principal"
                 aria-hidden={!sidebarAberta}
                 className={cn(
-                    "fixed top-0 left-0 h-full z-50 w-64 bg-dark-800 border-r border-white/5",
-                    "flex flex-col transition-transform duration-300",
+                    "fixed top-0 left-0 h-full z-50 w-64 flex flex-col transition-transform duration-300",
+                    "bg-gradient-to-b from-dark-800 via-dark-800 to-dark-900",
+                    "border-r border-white/5 shadow-2xl",
                     sidebarAberta ? "translate-x-0" : "-translate-x-full"
                 )}
             >
-                <div className="flex items-center justify-end p-5 gap-5 border-b border-white/5">
-
-                    <span className="text-xs text-muted-foreground capitalize">
-                        {dataAtualFormatada()}
-                    </span>
-
+                {/* Header do sidebar */}
+                <div className="flex items-center justify-between p-5 border-b border-white/5">
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-xl bg-brand-gradient flex items-center justify-center glow-green">
+                            <span className="text-sm font-bold text-white">M$</span>
+                        </div>
+                        <span className="text-sm font-semibold text-foreground">MinhasConta$</span>
+                    </div>
                     <button
                         onClick={() => setSidebarAberta(false)}
                         aria-label="Fechar menu"
@@ -164,6 +168,7 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                     </button>
                 </div>
 
+                {/* Nav links */}
                 <nav className="flex-1 p-4 space-y-1" aria-label="Páginas do app">
                     {navLinks.map(({ href, label, icon: Icon }) => (
                         <Link
@@ -171,20 +176,20 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                             href={href}
                             onClick={() => setSidebarAberta(false)}
                             className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm
-                         text-muted-foreground hover:text-foreground hover:bg-white/5
-                         transition-all focus-visible:outline-none focus-visible:ring-2
-                         focus-visible:ring-brand-500"
+                   text-muted-foreground hover:text-foreground hover:bg-brand-500/10
+                   hover:text-brand-400 transition-all focus-visible:outline-none
+                   focus-visible:ring-2 focus-visible:ring-brand-500"
                         >
                             <Icon size={18} aria-hidden="true" />
                             {label}
                         </Link>
                     ))}
-
-
                 </nav>
 
-                <div className="p-4 border-t border-white/5">
+                {/* Footer */}
+                <div className="p-4 border-t border-white/5 space-y-1">
                     <p className="text-xs text-muted-foreground text-center">MinhasConta$ v1.0</p>
+                    <p className="text-xs text-muted-foreground/50 text-center">{dataAtualFormatada()}</p>
                 </div>
             </aside>
 
@@ -325,7 +330,7 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                             className="p-2 rounded-xl hover:bg-white/5 text-muted-foreground 
                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
                         >
-                            <Menu size={20} aria-hidden="true" />
+
                         </button>
                         <Link href="/perfil">
                             <AvatarUsuario
