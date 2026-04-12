@@ -63,9 +63,6 @@ export default async function HomePage() {
     }
   }
 
-  const usuario = await prisma.usuario.findUnique({
-    where: { id: session.user.id },
-  });
 
   const contas = await prisma.conta.findMany({
     where: { mes, ano, usuarioId: session.user.id },
