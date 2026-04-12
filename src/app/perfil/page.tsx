@@ -8,6 +8,7 @@ import { AvatarUsuario } from "@/components/AvatarUsuario";
 import type { Usuario } from "@/types/usuario";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { signOut } from "next-auth/react";
 
 export default function PerfilPage() {
     const [usuario, setUsuario] = useState<Usuario | null>(null);
@@ -143,6 +144,15 @@ export default function PerfilPage() {
                      focus-visible:ring-2 focus-visible:ring-brand-500
                      focus-visible:ring-offset-2 focus-visible:ring-offset-dark-900">
                         {isSubmitting ? "Salvando..." : "Salvar alterações"}
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => signOut({ callbackUrl: "/login" })}
+                        className="w-full py-3 rounded-2xl border border-destructive/30 text-destructive 
+             text-sm font-medium hover:bg-destructive/10 transition-all mt-2"
+                    >
+                        Sair da conta
                     </button>
 
                     {salvo && (

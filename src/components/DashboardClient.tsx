@@ -1,7 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Search, SlidersHorizontal, Menu, X, Home, History, BarChart2, User } from "lucide-react";
+import {
+    Plus,
+    Search,
+    SlidersHorizontal,
+    Menu,
+    X,
+    Home,
+    History,
+    BarChart2,
+    User,
+    LogOut,
+} from "lucide-react";
 import Link from "next/link";
 import { AvatarUsuario } from "./AvatarUsuario";
 import { Resumo } from "./Resumo";
@@ -9,7 +20,6 @@ import { ContaCard } from "./ContaCard";
 import { ContaForm } from "./ContaForm";
 import { ModalPagamento } from "./ModalPagamento";
 import { PrimeiroAcesso } from "./PrimeiroAcesso";
-import { nomeMes, cn } from "@/lib/utils";
 import type { Conta } from "@/types/conta";
 import type { Usuario } from "@/types/usuario";
 import { SeletorTema } from "./SeletorTema";
@@ -17,6 +27,8 @@ import { Palette } from "lucide-react";
 import { LoadingScreen } from "./LoadingScreen";
 import { CalendarioModal } from "./CalendarioModal";
 import { CalendarDays } from "lucide-react";
+import { signOut } from "next-auth/react";
+import { cn } from "@/lib/utils";
 
 interface Props {
     usuarioInicial: Usuario | null;
@@ -32,11 +44,18 @@ const navLinks = [
     { href: "/perfil", label: "Perfil", icon: User },
 ];
 
-export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Props) {
+export function DashboardClient({
+    usuarioInicial,
+    contasIniciais,
+    mes,
+    ano,
+}: Props) {
     const [usuario, setUsuario] = useState<Usuario | null>(usuarioInicial);
     const [contas, setContas] = useState<Conta[]>(contasIniciais);
     const [busca, setBusca] = useState("");
-    const [filtroStatus, setFiltroStatus] = useState<"todos" | "pendente" | "pago">("todos");
+    const [filtroStatus, setFiltroStatus] = useState<
+        "todos" | "pendente" | "pago"
+    >("todos");
     const [filtroBanco, setFiltroBanco] = useState("");
     const [mostrarFiltros, setMostrarFiltros] = useState(false);
     const [modalForm, setModalForm] = useState(false);
@@ -47,7 +66,6 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
     const [loadingTerminou, setLoadingTerminou] = useState(false);
     const [mostrarCalendario, setMostrarCalendario] = useState(false);
 
-
     useEffect(() => {
         if (!usuario) return;
 
@@ -57,7 +75,6 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
         return () => window.removeEventListener("focus", handleFocus);
     }, [usuario]);
 
-
     if (!usuario) return <PrimeiroAcesso onCriado={setUsuario} />;
 
     // Renderiza loading + conteúdo ao mesmo tempo
@@ -65,7 +82,9 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
 
     const contasFiltradas = contas.filter((c) => {
         const buscaNome = c.nome.toLowerCase().includes(busca.toLowerCase());
-        const buscaBanco = c.banco.toLowerCase().includes(filtroBanco.toLowerCase());
+        const buscaBanco = c.banco
+            .toLowerCase()
+            .includes(filtroBanco.toLowerCase());
         const matchStatus =
             filtroStatus === "todos" ||
             (filtroStatus === "pago" && c.pago) ||
@@ -76,11 +95,13 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
     const total = contas.reduce((s, c) => s + c.valor, 0);
     const pago = contas.filter((c) => c.pago).reduce((s, c) => s + c.valor, 0);
     const hora = new Date().getHours();
-    const saudacao = hora < 12 ? "Bom dia" : hora < 18 ? "Boa tarde" : "Boa noite";
-
+    const saudacao =
+        hora < 12 ? "Bom dia" : hora < 18 ? "Boa tarde" : "Boa noite";
 
     async function recarregarContas() {
-        const res = await fetch(`/api/contas?mes=${mes}&ano=${ano}&usuarioId=${usuario!.id}`);
+        const res = await fetch(
+            `/api/contas?mes=${mes}&ano=${ano}&usuarioId=${usuario!.id}`,
+        );
         const data = await res.json();
         setContas(data);
     }
@@ -106,7 +127,11 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
         });
     }
 
-    async function confirmarPagamento(id: string, novoPago: boolean, data: string | null) {
+    async function confirmarPagamento(
+        id: string,
+        novoPago: boolean,
+        data: string | null,
+    ) {
         await fetch(`/api/contas/${id}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
@@ -120,11 +145,11 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
         setModalPagamento(null);
     }
 
-    const inputClass = "bg-dark-700 border border-white/5 rounded-xl text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-brand-500";
+    const inputClass =
+        "bg-dark-700 border border-white/5 rounded-xl text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-brand-500";
 
     return (
         <div className="min-h-screen bg-dark-900">
-
             {/* Loading screen — some depois de 2.2s */}
             <LoadingScreen onTerminou={() => setLoadingTerminou(true)} />
 
@@ -137,7 +162,6 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                 />
             )}
 
-
             {/* ── SIDEBAR ── só desktop ── */}
             <aside
                 id="sidebar-menu"
@@ -148,7 +172,7 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                     "fixed top-0 left-0 h-full z-50 w-64 flex flex-col transition-transform duration-300",
                     "bg-gradient-to-b from-dark-800 via-dark-800 to-dark-900",
                     "border-r border-white/5 shadow-2xl",
-                    sidebarAberta ? "translate-x-0" : "-translate-x-full"
+                    sidebarAberta ? "translate-x-0" : "-translate-x-full",
                 )}
             >
                 {/* Header do sidebar */}
@@ -157,7 +181,9 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                         <div className="w-8 h-8 rounded-xl bg-brand-gradient flex items-center justify-center glow-green">
                             <span className="text-sm font-bold text-white">M$</span>
                         </div>
-                        <span className="text-sm font-semibold text-foreground">MinhasConta$</span>
+                        <span className="text-sm font-semibold text-foreground">
+                            MinhasConta$
+                        </span>
                     </div>
                     <button
                         onClick={() => setSidebarAberta(false)}
@@ -186,10 +212,18 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                     ))}
                 </nav>
 
-                {/* Footer */}
-                <div className="p-4 border-t border-white/5 space-y-1">
-                    <p className="text-xs text-muted-foreground text-center">MinhasConta$ v1.0</p>
-                    <p className="text-xs text-muted-foreground/50 text-center">{dataAtualFormatada()}</p>
+                <div className="p-4 border-t border-white/5 space-y-2">
+                    <button
+                        onClick={() => signOut({ callbackUrl: "/login" })}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm
+               text-destructive hover:bg-destructive/10 transition-all"
+                    >
+                        <LogOut size={18} aria-hidden="true" />
+                        Sair
+                    </button>
+                    <p className="text-xs text-muted-foreground text-center">
+                        MinhasConta$ v1.0
+                    </p>
                 </div>
             </aside>
 
@@ -209,7 +243,10 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                         <Menu size={20} aria-hidden="true" />
                     </button>
                     <div>
-                        <p className="text-xs text-muted-foreground" suppressHydrationWarning>
+                        <p
+                            className="text-xs text-muted-foreground"
+                            suppressHydrationWarning
+                        >
                             {saudacao},
                         </p>
                         <p className="text-lg font-semibold capitalize">
@@ -220,8 +257,14 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
 
                 {/* Busca desktop */}
                 <div className="relative w-72">
-                    <label htmlFor="busca-desktop" className="sr-only">Buscar conta</label>
-                    <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+                    <label htmlFor="busca-desktop" className="sr-only">
+                        Buscar conta
+                    </label>
+                    <Search
+                        size={15}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                        aria-hidden="true"
+                    />
                     <input
                         id="busca-desktop"
                         value={busca}
@@ -256,7 +299,6 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                         >
                             <CalendarDays size={18} aria-hidden="true" />
                         </button>
-
 
                         {mostrarTema && (
                             <>
@@ -296,12 +338,16 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                 </a>
 
                 {/* Header mobile */}
-                <div className={`flex items-center justify-between mb-5 md:hidden
-       ${loadingTerminou ? "animate-fade-in" : "opacity-0"}`}>
-
+                <div
+                    className={`flex items-center justify-between mb-5 md:hidden
+       ${loadingTerminou ? "animate-fade-in" : "opacity-0"}`}
+                >
                     {/* Esquerda: saudação */}
                     <div>
-                        <p className="text-xs text-muted-foreground" suppressHydrationWarning>
+                        <p
+                            className="text-xs text-muted-foreground"
+                            suppressHydrationWarning
+                        >
                             {saudacao},
                         </p>
                         <h1 className="text-xl font-semibold capitalize">
@@ -312,38 +358,42 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                         </p>
                     </div>
 
-                    {/* Direita: calendário + menu + avatar */}
+                    {/* Direita: calendário + logout + avatar */}
                     <div className="flex items-center gap-2">
                         <button
                             onClick={() => setMostrarCalendario(true)}
                             aria-label="Abrir calendário"
                             className="p-2 rounded-xl hover:bg-white/5 text-muted-foreground 
-                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
                         >
                             <CalendarDays size={20} aria-hidden="true" />
                         </button>
-                        <button
-                            onClick={() => setSidebarAberta(true)}
-                            aria-label="Abrir menu de navegação"
-                            aria-expanded={sidebarAberta}
-                            aria-controls="sidebar-menu"
-                            className="p-2 rounded-xl hover:bg-white/5 text-muted-foreground 
-                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
-                        >
 
-                        </button>
                         <Link href="/perfil">
                             <AvatarUsuario
                                 genero={usuario.genero as "masculino" | "feminino" | "outro"}
                                 tamanho={38}
                             />
                         </Link>
+
+                        <button
+                            onClick={() => signOut({ callbackUrl: "/login" })}
+                            aria-label="Sair da conta"
+                            className="p-2 rounded-xl hover:bg-white/5 text-destructive 
+               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                        >
+                            <LogOut size={20} aria-hidden="true" />
+                        </button>
                     </div>
                 </div>
 
                 {/* Resumo financeiro */}
-                <section className={`mb-5 ${loadingTerminou ? "animate-slide-up" : "opacity-0"}`}
-                    style={{ animationDelay: loadingTerminou ? "100ms" : "0ms", animationFillMode: "both" }}
+                <section
+                    className={`mb-5 ${loadingTerminou ? "animate-slide-up" : "opacity-0"}`}
+                    style={{
+                        animationDelay: loadingTerminou ? "100ms" : "0ms",
+                        animationFillMode: "both",
+                    }}
                 >
                     <Resumo total={total} pago={pago} pendente={total - pago} />
                 </section>
@@ -352,14 +402,22 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                 <section
                     className={`flex flex-col md:flex-row gap-3 mb-5
                     ${loadingTerminou ? "animate-slide-up" : "opacity-0"}`}
-                    style={{ animationDelay: loadingTerminou ? "200ms" : "0ms", animationFillMode: "both" }}
+                    style={{
+                        animationDelay: loadingTerminou ? "200ms" : "0ms",
+                        animationFillMode: "both",
+                    }}
                 >
-
                     {/* Busca mobile */}
                     <div className="flex gap-2 md:hidden">
                         <div className="flex-1 relative">
-                            <label htmlFor="busca-mobile" className="sr-only">Buscar conta</label>
-                            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+                            <label htmlFor="busca-mobile" className="sr-only">
+                                Buscar conta
+                            </label>
+                            <Search
+                                size={15}
+                                className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                                aria-hidden="true"
+                            />
                             <input
                                 id="busca-mobile"
                                 value={busca}
@@ -370,22 +428,30 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                         </div>
                         <button
                             onClick={() => setMostrarFiltros(!mostrarFiltros)}
-                            aria-label={mostrarFiltros ? "Ocultar filtros" : "Mostrar filtros"}
+                            aria-label={
+                                mostrarFiltros ? "Ocultar filtros" : "Mostrar filtros"
+                            }
                             aria-expanded={mostrarFiltros}
                             className={cn(
                                 "p-2.5 rounded-xl border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500",
                                 mostrarFiltros
                                     ? "bg-brand-500/10 border-brand-500/30 text-brand-400"
-                                    : "bg-dark-700 border-white/5 text-muted-foreground"
+                                    : "bg-dark-700 border-white/5 text-muted-foreground",
                             )}
                         >
                             <SlidersHorizontal size={18} aria-hidden="true" />
                         </button>
-                    </div >
+                    </div>
 
                     {/* Filtros desktop */}
-                    < div className="hidden md:flex gap-3 flex-1" role="group" aria-label="Filtros de contas" >
-                        <label htmlFor="filtro-banco" className="sr-only">Filtrar por banco</label>
+                    <div
+                        className="hidden md:flex gap-3 flex-1"
+                        role="group"
+                        aria-label="Filtros de contas"
+                    >
+                        <label htmlFor="filtro-banco" className="sr-only">
+                            Filtrar por banco
+                        </label>
                         <input
                             id="filtro-banco"
                             value={filtroBanco}
@@ -393,21 +459,28 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                             placeholder="Filtrar banco..."
                             className={`px-4 py-2.5 w-48 ${inputClass}`}
                         />
-                        <label htmlFor="filtro-status" className="sr-only">Filtrar por status</label>
+                        <label htmlFor="filtro-status" className="sr-only">
+                            Filtrar por status
+                        </label>
                         <select
                             id="filtro-status"
                             value={filtroStatus}
-                            onChange={(e) => setFiltroStatus(e.target.value as "todos" | "pendente" | "pago")}
+                            onChange={(e) =>
+                                setFiltroStatus(e.target.value as "todos" | "pendente" | "pago")
+                            }
                             className={`px-4 py-2.5 ${inputClass} text-foreground`}
                         >
                             <option value="todos">Todos</option>
                             <option value="pendente">Pendente</option>
                             <option value="pago">Pago</option>
                         </select>
-                    </div >
+                    </div>
 
                     <button
-                        onClick={() => { setContaEditando(null); setModalForm(true); }}
+                        onClick={() => {
+                            setContaEditando(null);
+                            setModalForm(true);
+                        }}
                         aria-label="Adicionar nova conta"
                         className="flex items-center justify-center gap-2 py-2.5 px-6 rounded-2xl
                        bg-brand-gradient text-sm font-semibold text-white
@@ -419,38 +492,42 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                         <Plus size={18} aria-hidden="true" />
                         Adicionar conta
                     </button>
-                </section >
+                </section>
 
                 {/* Filtros mobile expansíveis */}
-                {
-                    mostrarFiltros && (
-                        <div
-                            className="flex gap-2 mb-4 md:hidden"
-                            role="group"
-                            aria-label="Filtros adicionais"
+                {mostrarFiltros && (
+                    <div
+                        className="flex gap-2 mb-4 md:hidden"
+                        role="group"
+                        aria-label="Filtros adicionais"
+                    >
+                        <label htmlFor="filtro-banco-mobile" className="sr-only">
+                            Filtrar por banco
+                        </label>
+                        <input
+                            id="filtro-banco-mobile"
+                            value={filtroBanco}
+                            onChange={(e) => setFiltroBanco(e.target.value)}
+                            placeholder="Filtrar banco..."
+                            className={`flex-1 px-3 py-2 text-xs ${inputClass}`}
+                        />
+                        <label htmlFor="filtro-status-mobile" className="sr-only">
+                            Filtrar por status
+                        </label>
+                        <select
+                            id="filtro-status-mobile"
+                            value={filtroStatus}
+                            onChange={(e) =>
+                                setFiltroStatus(e.target.value as "todos" | "pendente" | "pago")
+                            }
+                            className={`px-3 py-2 text-xs ${inputClass} text-foreground`}
                         >
-                            <label htmlFor="filtro-banco-mobile" className="sr-only">Filtrar por banco</label>
-                            <input
-                                id="filtro-banco-mobile"
-                                value={filtroBanco}
-                                onChange={(e) => setFiltroBanco(e.target.value)}
-                                placeholder="Filtrar banco..."
-                                className={`flex-1 px-3 py-2 text-xs ${inputClass}`}
-                            />
-                            <label htmlFor="filtro-status-mobile" className="sr-only">Filtrar por status</label>
-                            <select
-                                id="filtro-status-mobile"
-                                value={filtroStatus}
-                                onChange={(e) => setFiltroStatus(e.target.value as "todos" | "pendente" | "pago")}
-                                className={`px-3 py-2 text-xs ${inputClass} text-foreground`}
-                            >
-                                <option value="todos">Todos</option>
-                                <option value="pendente">Pendente</option>
-                                <option value="pago">Pago</option>
-                            </select>
-                        </div>
-                    )
-                }
+                            <option value="todos">Todos</option>
+                            <option value="pendente">Pendente</option>
+                            <option value="pago">Pago</option>
+                        </select>
+                    </div>
+                )}
 
                 {/* Lista de contas */}
                 <section
@@ -459,10 +536,18 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                     aria-live="polite"
                     aria-atomic="false"
                 >
-                    <div className="overflow-y-auto pr-1" style={{ maxHeight: "calc(100vh - 420px)" }}>
+                    <div
+                        className="overflow-y-auto pr-1"
+                        style={{ maxHeight: "calc(100vh - 420px)" }}
+                    >
                         {contasFiltradas.length === 0 ? (
-                            <div className="text-center py-16 text-muted-foreground" role="status">
-                                <p className="text-5xl mb-4" aria-hidden="true">📋</p>
+                            <div
+                                className="text-center py-16 text-muted-foreground"
+                                role="status"
+                            >
+                                <p className="text-5xl mb-4" aria-hidden="true">
+                                    📋
+                                </p>
                                 <p className="text-sm">Nenhuma conta encontrada</p>
                             </div>
                         ) : (
@@ -470,9 +555,13 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                                 {contasFiltradas.map((conta, index) => (
                                     <li
                                         key={conta.id}
-                                        className={loadingTerminou ? "animate-slide-up" : "opacity-0"}
+                                        className={
+                                            loadingTerminou ? "animate-slide-up" : "opacity-0"
+                                        }
                                         style={{
-                                            animationDelay: loadingTerminou ? `${300 + index * 60}ms` : "0ms",
+                                            animationDelay: loadingTerminou
+                                                ? `${300 + index * 60}ms`
+                                                : "0ms",
                                             animationFillMode: "both",
                                         }}
                                     >
@@ -480,7 +569,10 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                                             conta={conta}
                                             onMarcarPago={handleMarcarPago}
                                             onExcluir={handleExcluir}
-                                            onEditar={(c) => { setContaEditando(c); setModalForm(true); }}
+                                            onEditar={(c) => {
+                                                setContaEditando(c);
+                                                setModalForm(true);
+                                            }}
                                         />
                                     </li>
                                 ))}
@@ -488,29 +580,28 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                         )}
                     </div>
                 </section>
-            </main >
+            </main>
 
             {/* Modais */}
-            {
-                modalForm && (
-                    <ContaForm
-                        conta={contaEditando}
-                        usuarioId={usuario.id}
-                        mes={mes}
-                        ano={ano}
-                        onFechar={() => { setModalForm(false); setContaEditando(null); }}
-                        onSalvo={recarregarContas}
-                    />
-                )
-            }
-            {
-                modalPagamento && (
-                    <ModalPagamento
-                        onFechar={() => setModalPagamento(null)}
-                        onConfirmar={(data) => confirmarPagamento(modalPagamento, true, data)}
-                    />
-                )
-            }
+            {modalForm && (
+                <ContaForm
+                    conta={contaEditando}
+                    usuarioId={usuario.id}
+                    mes={mes}
+                    ano={ano}
+                    onFechar={() => {
+                        setModalForm(false);
+                        setContaEditando(null);
+                    }}
+                    onSalvo={recarregarContas}
+                />
+            )}
+            {modalPagamento && (
+                <ModalPagamento
+                    onFechar={() => setModalPagamento(null)}
+                    onConfirmar={(data) => confirmarPagamento(modalPagamento, true, data)}
+                />
+            )}
 
             {mostrarCalendario && (
                 <CalendarioModal
@@ -520,6 +611,6 @@ export function DashboardClient({ usuarioInicial, contasIniciais, mes, ano }: Pr
                     onFechar={() => setMostrarCalendario(false)}
                 />
             )}
-        </div >
+        </div>
     );
 }
